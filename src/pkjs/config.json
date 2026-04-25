@@ -1,0 +1,879 @@
+[
+  {
+    "type": "heading",
+    "defaultValue": "Your Style Configuration"
+  },
+  {
+    "type": "text",
+    "defaultValue": "Configure the Your Style Watchface."
+  },
+  {
+    "type": "section",
+    "items": [
+      {
+        "type": "heading",
+        "defaultValue": "Color Settings"
+      },
+      {
+        "type": "text",
+        "defaultValue": "Choose from all available colors."
+      },
+      {
+        "type": "color",
+        "sunlight": false,
+        "messageKey": "backcolor",
+        "defaultValue": "0xFFFFFF",
+        "label": "Background Color"
+      },
+      {
+        "type": "text",
+        "defaultValue": "<p style='color:lightblue'>HAND COLOR</p>"
+      },
+      {
+        "type": "color",
+        "sunlight": false,
+        "messageKey": "hourdialcolor",
+        "defaultValue": "0x000000",
+        "label": "Color of the Hour Hand"
+      },
+      {
+        "type": "color",
+        "sunlight": false,
+        "messageKey": "minsdialcolor",
+        "defaultValue": "0x000000",
+        "label": "Color of the Minutes Hand"
+      },
+      {
+        "type": "color",
+        "sunlight": false,
+        "messageKey": "secsdialcolor",
+        "defaultValue": "0x000000",
+        "label": "Color of the Seconds Hand"
+      },
+      {
+        "type": "text",
+        "defaultValue": "<p style='color:lightblue'>HAND FILLING COLOR</p>"
+      },
+      {
+        "type": "color",
+        "sunlight": false,
+        "messageKey": "hourfillcolor",
+        "defaultValue": "0x000000",
+        "label": "Color of the Hour Hand Filling"
+      },
+      {
+        "type": "color",
+        "sunlight": false,
+        "messageKey": "minsfillcolor",
+        "defaultValue": "0x000000",
+        "label": "Color of the Minutes Hand Filling"
+      },
+      {
+        "type": "color",
+        "sunlight": false,
+        "messageKey": "secsfillcolor",
+        "defaultValue": "0x000000",
+        "label": "Color of the Seconds Hand Filling"
+      },
+      {
+        "type": "text",
+        "defaultValue": "<p style='color:lightblue'>MARK COLOR</p>"
+      },
+      {
+        "type": "color",
+        "sunlight": false,
+        "messageKey": "hourmarkcolor",
+        "defaultValue": "0x000000",
+        "label": "Color of the Hour Marks"
+      },
+      {
+        "type": "color",
+        "sunlight": false,
+        "messageKey": "minsmarkcolor",
+        "defaultValue": "0x000000",
+        "label": "Color of the Minute Marks"
+      }
+    ]
+  },
+  {
+    "type": "section",
+    "items": [
+      {
+        "type": "heading",
+        "defaultValue": "Length Settings"
+      },
+      {
+        "type": "text",
+        "defaultValue": "100 means full length from the center to the rim."
+      },
+      {
+        "type": "text",
+        "defaultValue": "<p style='color:lightblue'>HAND LENGTH</p>"
+      },
+      {
+        "type": "slider",
+        "messageKey": "hourlength",
+        "defaultValue": 65,
+        "label": "Hour Hand",
+        "min": 0,
+        "max": 100,
+        "step": 1
+      },
+      {
+        "type": "slider",
+        "messageKey": "minslength",
+        "defaultValue": 85,
+        "label": "Minute Hand",
+        "min": 0,
+        "max": 100,
+        "step": 1
+      },
+      {
+        "type": "slider",
+        "messageKey": "secslength",
+        "defaultValue": 90,
+        "label": "Seconds Hand",
+        "min": 0,
+        "max": 100,
+        "step": 1
+      },
+      {
+        "type": "text",
+        "defaultValue": "<p style='color:lightblue'>COUNTERBALANCE LENGTH</p>"
+      },
+      {
+        "type": "slider",
+        "messageKey": "hourbalancelength",
+        "defaultValue": 1,
+        "label": "Hour Hand",
+        "min": 0,
+        "max": 100,
+        "step": 1
+      },
+      {
+        "type": "slider",
+        "messageKey": "minsbalancelength",
+        "defaultValue": 1,
+        "label": "Minute Hand",
+        "min": 0,
+        "max": 100,
+        "step": 1
+      },
+      {
+        "type": "slider",
+        "messageKey": "secsbalancelength",
+        "defaultValue": 20,
+        "label": "Seconds Hand",
+        "min": 0,
+        "max": 100,
+        "step": 1
+      }
+    ]
+  },
+  {
+    "type": "section",
+    "items": [
+      {
+        "type": "heading",
+        "defaultValue": "Position of the Hand Fillings"
+      },
+      {
+        "type": "text",
+        "defaultValue": "0 means center, 100 means outer rim."
+      },
+      {
+        "type": "text",
+        "defaultValue": "<p style='color:lightblue'>HOUR HAND</p>"
+      },
+      {
+        "type": "slider",
+        "messageKey": "hourfillinnerpos",
+        "defaultValue": 1,
+        "label": "Start Position",
+        "min": 0,
+        "max": 100,
+        "step": 1
+      },
+      {
+        "type": "slider",
+        "messageKey": "hourfillouterpos",
+        "defaultValue": 1,
+        "label": "End Position",
+        "min": 0,
+        "max": 100,
+        "step": 1
+      },
+      {
+        "type": "text",
+        "defaultValue": "<p style='color:lightblue'>MINUTE HAND</p>"
+      },
+      {
+        "type": "slider",
+        "messageKey": "minsfillinnerpos",
+        "defaultValue": 1,
+        "label": "Start Position",
+        "min": 0,
+        "max": 100,
+        "step": 1
+      },
+      {
+        "type": "slider",
+        "messageKey": "minsfillouterpos",
+        "defaultValue": 1,
+        "label": "End Position",
+        "min": 0,
+        "max": 100,
+        "step": 1
+      },
+      {
+        "type": "text",
+        "defaultValue": "<p style='color:lightblue'>SECONDS HAND</p>"
+      },
+      {
+        "type": "slider",
+        "messageKey": "secsfillinnerpos",
+        "defaultValue": 1,
+        "label": "Start Position",
+        "min": 0,
+        "max": 100,
+        "step": 1
+      },
+      {
+        "type": "slider",
+        "messageKey": "secsfillouterpos",
+        "defaultValue": 1,
+        "label": "End Position",
+        "min": 0,
+        "max": 100,
+        "step": 1
+      }
+    ]
+  },
+  {
+    "type": "section",
+    "items": [
+      {
+        "type": "heading",
+        "defaultValue": "Position of the Marks"
+      },
+      {
+        "type": "text",
+        "defaultValue": "0 means center, 100 means outer rim."
+      },
+      {
+        "type": "text",
+        "defaultValue": "<p style='color:lightblue'>HOUR MARK</p>"
+      },
+      {
+        "type": "slider",
+        "messageKey": "hourmarkinnerpos",
+        "defaultValue": 85,
+        "label": "Start Position",
+        "min": 0,
+        "max": 100,
+        "step": 1
+      },
+      {
+        "type": "slider",
+        "messageKey": "hourmarkouterpos",
+        "defaultValue": 100,
+        "label": "End Position",
+        "min": 0,
+        "max": 100,
+        "step": 1
+      },
+      {
+        "type": "text",
+        "defaultValue": "<p style='color:lightblue'>MINUTE MARK</p>"
+      },
+      {
+        "type": "slider",
+        "messageKey": "minsmarkinnerpos",
+        "defaultValue": 90,
+        "label": "Start Position",
+        "min": 0,
+        "max": 100,
+        "step": 1
+      },
+      {
+        "type": "slider",
+        "messageKey": "minsmarkouterpos",
+        "defaultValue": 100,
+        "label": "End Position",
+        "min": 0,
+        "max": 100,
+        "step": 1
+      }
+    ]
+  },
+  {
+    "type": "section",
+    "items": [
+      {
+        "type": "heading",
+        "defaultValue": "Hour Mark Style"
+      },
+      {
+        "type": "radiogroup",
+        "messageKey": "hourmarkstyle",
+        "label": "Select Style",
+        "defaultValue": "0",
+        "options": [
+          { "label": "All Marks", "value": "0" },
+          { "label": "Show even hours (2, 4, 6, ...)", "value": "1" },
+          { "label": "Show odd hours (1, 3, 5, ...)", "value": "2" },
+          { "label": "Gaps between 4 hour numbers", "value": "3" },
+          { "label": "All except 12 o'clock", "value": "4" }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "section",
+    "items": [
+      {
+        "type": "heading",
+        "defaultValue": "Minute Mark Style"
+      },
+      {
+        "type": "radiogroup",
+        "messageKey": "minutemarkstyle",
+        "label": "Select Style",
+        "defaultValue": "0",
+        "options": [
+          { "label": "All Marks", "value": "0" },
+          { "label": "Every 5th minute", "value": "1" },
+          { "label": "Every 15th minute", "value": "2" },
+          { "label": "Gap around all hour marks", "value": "3" },
+          { "label": "Gap around 12, 3, 6, 9", "value": "4" },
+          { "label": "Gap around 12 only", "value": "5" }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "section",
+    "items": [
+      {
+        "type": "heading",
+        "defaultValue": "Hour Number Settings"
+      },
+      {
+        "type": "toggle",
+        "messageKey": "shownumbers",
+        "defaultValue": false,
+        "label": "Enable Hour Numbers"
+      },
+      {
+        "type": "radiogroup",
+        "messageKey": "numberfont",
+        "label": "Select Font Size",
+        "defaultValue": "0",
+        "options": [
+          { "label": "9 pt.", "value": "0" },
+          { "label": "14 pt.", "value": "1" },
+          { "label": "14 pt. bold", "value": "2" },
+          { "label": "18 pt.", "value": "3" },
+          { "label": "18 pt. bold", "value": "4" },
+          { "label": "24 pt.", "value": "5" },
+          { "label": "24 pt. bold", "value": "6" },
+          { "label": "28 pt.", "value": "7" },
+          { "label": "28 pt. bold", "value": "8" },
+          { "label": "30 pt. black", "value": "9" }
+        ]
+      },
+      {
+        "type": "radiogroup",
+        "messageKey": "numberstyle",
+        "label": "Select Number Selection",
+        "defaultValue": "0",
+        "options": [
+          { "label": "All Numbers", "value": "0" },
+          { "label": "Show even numbers", "value": "1" },
+          { "label": "Show odd numbers", "value": "2" },
+          { "label": "4 Numbers (12, 3, 6, 9)", "value": "3" },
+          { "label": "3 Numbers (12, 3, 6)", "value": "4" },
+          { "label": "3 Numbers (12, 6, 9)", "value": "5" },
+          { "label": "3 Numbers (12, 3, 9)", "value": "6" },
+          { "label": "3 Numbers (3, 6, 9)", "value": "7" },
+          { "label": "2 Numbers (12, 6)", "value": "8" },
+          { "label": "2 Numbers (3, 9)", "value": "9" },
+          { "label": "12 only", "value": "10" }
+        ]
+      },
+      {
+        "type": "radiogroup",
+        "messageKey": "numberset",
+        "label": "Select Format",
+        "defaultValue": "0",
+        "options": [
+          { "label": "Arabic", "value": "0" },
+          { "label": "Roman", "value": "1" }
+        ]
+      },
+      {
+        "type": "slider",
+        "messageKey": "numberpos",
+        "defaultValue": 70,
+        "label": "Position (0 = center, 100 = rim)",
+        "min": 0,
+        "max": 100,
+        "step": 1
+      },
+      {
+        "type": "text",
+        "defaultValue": "<p style='color:lightblue'>NUMBER COLOR</p>"
+      },
+      {
+        "type": "color",
+        "sunlight": false,
+        "messageKey": "numbercolor",
+        "defaultValue": "0xFFFFFF",
+        "label": "Text Color"
+      }
+    ]
+  },
+  {
+    "type": "section",
+    "items": [
+      {
+        "type": "heading",
+        "defaultValue": "Thickness Settings"
+      },
+      {
+        "type": "text",
+        "defaultValue": "<p style='color:lightblue'>HOUR HAND</p>"
+      },
+      {
+        "type": "slider",
+        "messageKey": "hourthickness",
+        "defaultValue": 9,
+        "label": "Hand",
+        "min": 1,
+        "max": 31,
+        "step": 2
+      },
+      {
+        "type": "slider",
+        "messageKey": "hourfillthickness",
+        "defaultValue": 5,
+        "label": "Filling",
+        "min": 1,
+        "max": 31,
+        "step": 2
+      },
+      {
+        "type": "text",
+        "defaultValue": "<p style='color:lightblue'>MINUTE HAND</p>"
+      },
+      {
+        "type": "slider",
+        "messageKey": "minsthickness",
+        "defaultValue": 7,
+        "label": "Hand",
+        "min": 1,
+        "max": 31,
+        "step": 2
+      },
+      {
+        "type": "slider",
+        "messageKey": "minsfillthickness",
+        "defaultValue": 3,
+        "label": "Filling",
+        "min": 1,
+        "max": 31,
+        "step": 2
+      },
+      {
+        "type": "text",
+        "defaultValue": "<p style='color:lightblue'>SECONDS HAND</p>"
+      },
+      {
+        "type": "slider",
+        "messageKey": "secsthickness",
+        "defaultValue": 5,
+        "label": "Hand",
+        "min": 1,
+        "max": 31,
+        "step": 2
+      },
+      {
+        "type": "slider",
+        "messageKey": "secsfillthickness",
+        "defaultValue": 1,
+        "label": "Filling",
+        "min": 1,
+        "max": 31,
+        "step": 2
+      },
+      {
+        "type": "text",
+        "defaultValue": "<p style='color:lightblue'>MARKS</p>"
+      },
+      {
+        "type": "slider",
+        "messageKey": "hourmarkthickness",
+        "defaultValue": 5,
+        "label": "Hour Mark",
+        "min": 1,
+        "max": 21,
+        "step": 2
+      },
+      {
+        "type": "slider",
+        "messageKey": "minsmarkthickness",
+        "defaultValue": 3,
+        "label": "Minute Mark",
+        "min": 1,
+        "max": 21,
+        "step": 2
+      }
+    ]
+  },
+  {
+    "type": "section",
+    "items": [
+      {
+        "type": "heading",
+        "defaultValue": "Date Settings"
+      },
+      {
+        "type": "toggle",
+        "messageKey": "date",
+        "label": "Enable Date Display"
+      },
+      {
+        "type": "radiogroup",
+        "messageKey": "dateshape",
+        "label": "Shape",
+        "defaultValue": "0",
+        "options": [
+          { "label": "Round", "value": "0" },
+          { "label": "Square", "value": "1" }
+        ]
+      },
+      {
+        "type": "slider",
+        "messageKey": "dateposdegree",
+        "defaultValue": 90,
+        "label": "Position (degree)",
+        "min": 0,
+        "max": 360,
+        "step": 5
+      },
+      {
+        "type": "slider",
+        "messageKey": "datepositionrim",
+        "defaultValue": 80,
+        "label": "Position (0 = center, 100 = rim)",
+        "min": 0,
+        "max": 100,
+        "step": 1
+      },
+      {
+        "type": "radiogroup",
+        "messageKey": "datesize",
+        "label": "Size",
+        "defaultValue": "1",
+        "options": [
+          { "label": "Small", "value": "0" },
+          { "label": "Regular", "value": "1" },
+          { "label": "Large", "value": "2" }
+        ]
+      },
+      {
+        "type": "color",
+        "sunlight": false,
+        "messageKey": "datetextcolor",
+        "defaultValue": "0x000000",
+        "label": "Text Color"
+      },
+      {
+        "type": "color",
+        "sunlight": false,
+        "messageKey": "datebackcolor",
+        "defaultValue": "0xFFFFFF",
+        "label": "Background Color"
+      },
+      {
+        "type": "color",
+        "sunlight": false,
+        "messageKey": "datebordercolor",
+        "defaultValue": "0xFFFFFF",
+        "label": "Rim Color"
+      }
+    ]
+  },
+  {
+    "type": "section",
+    "items": [
+      {
+        "type": "heading",
+        "defaultValue": "Bluetooth Settings"
+      },
+      {
+        "type": "toggle",
+        "messageKey": "bluetooth",
+        "defaultValue": false,
+        "label": "Enable Bluetooth Display"
+      },
+      {
+        "type": "toggle",
+        "messageKey": "btalways",
+        "label": "Always On",
+        "defaultValue": true,
+        "description": "Switch off while positioning in order to see result."
+      },
+      {
+        "type": "toggle",
+        "messageKey": "btvibe",
+        "label": "Vibe On Disconnect",
+        "defaultValue": false
+      },
+      {
+        "type": "radiogroup",
+        "messageKey": "btshape",
+        "label": "Shape",
+        "defaultValue": "0",
+        "options": [
+          { "label": "Round", "value": "0" },
+          { "label": "Square", "value": "1" }
+        ]
+      },
+      {
+        "type": "slider",
+        "messageKey": "btposdegree",
+        "defaultValue": 180,
+        "label": "Position (degree)",
+        "min": 0,
+        "max": 360,
+        "step": 5
+      },
+      {
+        "type": "slider",
+        "messageKey": "btpositionrim",
+        "defaultValue": 50,
+        "label": "Position (0 = center, 100 = rim)",
+        "min": 0,
+        "max": 100,
+        "step": 1
+      },
+      {
+        "type": "radiogroup",
+        "messageKey": "btsize",
+        "label": "Size",
+        "defaultValue": "1",
+        "options": [
+          { "label": "Small", "value": "0" },
+          { "label": "Regular", "value": "1" },
+          { "label": "Large", "value": "2" }
+        ]
+      },
+      {
+        "type": "text",
+        "defaultValue": "<p style='color:lightblue'>CONNECTED COLORS</p>"
+      },
+      {
+        "type": "color",
+        "sunlight": false,
+        "messageKey": "btcolor",
+        "defaultValue": "0x000000",
+        "label": "Sign Color"
+      },
+      {
+        "type": "color",
+        "sunlight": false,
+        "messageKey": "btbackcolor",
+        "defaultValue": "0xFFFFFF",
+        "label": "Background Color"
+      },
+      {
+        "type": "color",
+        "sunlight": false,
+        "messageKey": "btbordercolor",
+        "defaultValue": "0x000000",
+        "label": "Rim Color"
+      },
+      {
+        "type": "text",
+        "defaultValue": "<p style='color:lightblue'>DISCONNECTED COLORS</p>"
+      },
+      {
+        "type": "color",
+        "sunlight": false,
+        "messageKey": "btoffcolor",
+        "defaultValue": "0xFFFFFF",
+        "label": "Sign Color"
+      },
+      {
+        "type": "color",
+        "sunlight": false,
+        "messageKey": "btoffbackcolor",
+        "defaultValue": "0x000000",
+        "label": "Background Color"
+      },
+      {
+        "type": "color",
+        "sunlight": false,
+        "messageKey": "btoffbordercolor",
+        "defaultValue": "0xFFFFFF",
+        "label": "Rim Color"
+      }
+    ]
+  },
+  {
+    "type": "section",
+    "items": [
+      {
+        "type": "heading",
+        "defaultValue": "Battery Settings"
+      },
+      {
+        "type": "toggle",
+        "messageKey": "battery",
+        "defaultValue": false,
+        "label": "Enable Battery Display"
+      },
+      {
+        "type": "slider",
+        "messageKey": "battwarnlevel",
+        "defaultValue": 30,
+        "label": "Low Battery Warning (Percent)",
+        "min": 0,
+        "max": 100,
+        "step": 10
+      },
+      {
+        "type": "radiogroup",
+        "messageKey": "battshape",
+        "label": "Shape",
+        "defaultValue": "0",
+        "options": [
+          { "label": "Round", "value": "0" },
+          { "label": "Square", "value": "1" }
+        ]
+      },
+      {
+        "type": "slider",
+        "messageKey": "battposdegree",
+        "defaultValue": 270,
+        "label": "Position (degree)",
+        "min": 0,
+        "max": 360,
+        "step": 5
+      },
+      {
+        "type": "slider",
+        "messageKey": "battpositionrim",
+        "defaultValue": 50,
+        "label": "Position (0 = center, 100 = rim)",
+        "min": 0,
+        "max": 100,
+        "step": 1
+      },
+      {
+        "type": "radiogroup",
+        "messageKey": "battsize",
+        "label": "Size",
+        "defaultValue": "1",
+        "options": [
+          { "label": "Small", "value": "0" },
+          { "label": "Regular", "value": "1" },
+          { "label": "Large", "value": "2" }
+        ]
+      },
+      {
+        "type": "text",
+        "defaultValue": "<p style='color:lightblue'>BATTERY GOOD COLORS</p>"
+      },
+      {
+        "type": "color",
+        "sunlight": false,
+        "messageKey": "battcolor",
+        "defaultValue": "0xFFFFFF",
+        "label": "Text Color"
+      },
+      {
+        "type": "color",
+        "sunlight": false,
+        "messageKey": "battbackcolor",
+        "defaultValue": "0x000000",
+        "label": "Background Color"
+      },
+      {
+        "type": "color",
+        "sunlight": false,
+        "messageKey": "battbordercolor",
+        "defaultValue": "0xFFFFFF",
+        "label": "Rim Color"
+      },
+      {
+        "type": "text",
+        "defaultValue": "<p style='color:lightblue'>LOW BATT COLORS</p>"
+      },
+      {
+        "type": "color",
+        "sunlight": false,
+        "messageKey": "battwarncolor",
+        "defaultValue": "0xFFFFFF",
+        "label": "Text Color"
+      },
+      {
+        "type": "color",
+        "sunlight": false,
+        "messageKey": "battwarnbackcolor",
+        "defaultValue": "0x000000",
+        "label": "Background Color"
+      },
+      {
+        "type": "color",
+        "sunlight": false,
+        "messageKey": "battwarnbordercolor",
+        "defaultValue": "0xFFFFFF",
+        "label": "Rim Color"
+      }
+    ]
+  },
+  {
+    "type": "section",
+    "items": [
+      {
+        "type": "heading",
+        "defaultValue": "Appearance Style"
+      },
+      {
+        "type": "toggle",
+        "messageKey": "fullscreen",
+        "defaultValue": true,
+        "label": "Fullscreen",
+        "description": "Effect is restricted to rectangular devices."
+      },
+      {
+        "type": "toggle",
+        "messageKey": "showsecond",
+        "defaultValue": false,
+        "label": "Show Seconds"
+      },
+      {
+        "type": "toggle",
+        "messageKey": "showminsmark",
+        "label": "Show Minute Marks",
+        "defaultValue": true
+      },
+      {
+        "type": "toggle",
+        "messageKey": "showhourmark",
+        "label": "Show Hour Marks",
+        "defaultValue": true
+      }
+    ]
+  },
+  {
+    "type": "text",
+    "defaultValue": "<div style='text-align:center; padding: 10px;'><p>If you like this watchface, consider a small donation:</p><form action='https://www.paypal.com/cgi-bin/webscr' method='post' target='_blank'><input type='hidden' name='cmd' value='_donations'><input type='hidden' name='business' value='mobil@kark.org'><input type='hidden' name='lc' value='US'><input type='hidden' name='item_name' value='Kieselleger Watchface'><input type='hidden' name='no_note' value='0'><input type='hidden' name='currency_code' value='USD'><input type='hidden' name='bn' value='PP-DonationsBF:btn_donateCC_LG.gif:NonHostedGuest'><input type='image' src='https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif' border='0' name='submit' alt='PayPal - The safer, easier way to pay online!'><img alt='' border='0' src='https://www.paypalobjects.com/de_DE/i/scr/pixel.gif' width='1' height='1'></form></div>"
+  },
+  {
+    "type": "submit",
+    "defaultValue": "Save Settings"
+  }
+]
