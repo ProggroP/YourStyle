@@ -86,6 +86,18 @@ typedef struct ClaySettings {
   GColor numbercolor;
   int minutemarkstyle;
   int hourmarkstyle;
+  int hourmarkrim;
+  int minsmarkrim;
+  int numberrim;
+  int showmoonphase;
+  int moonposdegree;
+  int moonpositionrim;
+  int moonradius;
+  GColor moonlightcolor;
+  GColor moondarkcolor;
+  int moonborder;
+  GColor moonbordercolor;
+  int moonhemisphere;
 } ClaySettings;
 
 // An instance of the struct
@@ -93,6 +105,12 @@ static ClaySettings settings;
 
 // Persistent storage key
 #define SETTINGS_KEY 1
+#define SETTINGS_KEY2 2
+
+// Pebble's persist_write_data/persist_read_data allow at most 256 bytes per
+// key (PERSIST_DATA_MAX_LENGTH). The settings struct has grown past that,
+// so it is split into two halves stored under separate keys.
+#define SETTINGS_SPLIT (sizeof(ClaySettings) / 2)
 
 // Initialize the default settings
 static void default_settings() {
@@ -176,6 +194,18 @@ static void default_settings() {
   settings.numbercolor       = GColorBlack;
   settings.minutemarkstyle   = 0;
   settings.hourmarkstyle     = 0;
+  settings.hourmarkrim       = 0;
+  settings.minsmarkrim       = 0;
+  settings.numberrim         = 0;
+  settings.showmoonphase     = 0;
+  settings.moonposdegree     = 45;
+  settings.moonpositionrim   = 50;
+  settings.moonradius        = 15;
+  settings.moonlightcolor    = GColorWhite;
+  settings.moondarkcolor     = GColorBlack;
+  settings.moonborder        = 1;
+  settings.moonbordercolor   = GColorBlack;
+  settings.moonhemisphere    = 0;
 }
 
 // Read settings from persistent storage
@@ -183,13 +213,18 @@ static void load_settings() {
   // Load the default settings
   default_settings();
 
-  // Read settings from persistent storage, if they exist
-  persist_read_data(SETTINGS_KEY, &settings, sizeof(settings));
+  // Read settings from persistent storage, if they exist.
+  // Split across two keys since one blob would exceed the 256 byte cap.
+  uint8_t *raw = (uint8_t *)&settings;
+  persist_read_data(SETTINGS_KEY, raw, SETTINGS_SPLIT);
+  persist_read_data(SETTINGS_KEY2, raw + SETTINGS_SPLIT, sizeof(settings) - SETTINGS_SPLIT);
 }
 
 // Save the settings to persistent storage
 static void save_settings() {
-  persist_write_data(SETTINGS_KEY, &settings, sizeof(settings));
+  uint8_t *raw = (uint8_t *)&settings;
+  persist_write_data(SETTINGS_KEY, raw, SETTINGS_SPLIT);
+  persist_write_data(SETTINGS_KEY2, raw + SETTINGS_SPLIT, sizeof(settings) - SETTINGS_SPLIT);
 }
 
 static void handle_time_tick(struct tm *tick_time, TimeUnits units_changed) {
@@ -322,6 +357,70 @@ static void in_received_handler(DictionaryIterator *iter, void *context) {
   Tuple *hourmarkouterpos_conf = dict_find(iter, MESSAGE_KEY_hourmarkouterpos);
   if( hourmarkouterpos_conf ) {
     settings.hourmarkouterpos = hourmarkouterpos_conf->value->int32;
+  } 
+
+  // read hour mark "reach case rim" setting
+  Tuple *hourmarkrim_conf = dict_find(iter, MESSAGE_KEY_hourmarkrim);
+  if( hourmarkrim_conf ) {
+    settings.hourmarkrim = hourmarkrim_conf->value->int32;
+  } 
+
+  // read minute mark "reach case rim" setting
+  Tuple *minsmarkrim_conf = dict_find(iter, MESSAGE_KEY_minsmarkrim);
+  if( minsmarkrim_conf ) {
+    settings.minsmarkrim = minsmarkrim_conf->value->int32;
+  } 
+
+  // read hour number "reach case rim" setting
+  Tuple *numberrim_conf = dict_find(iter, MESSAGE_KEY_numberrim);
+  if( numberrim_conf ) {
+    settings.numberrim = numberrim_conf->value->int32;
+  } 
+
+  // read moon phase settings
+  Tuple *showmoonphase_conf = dict_find(iter, MESSAGE_KEY_showmoonphase);
+  if( showmoonphase_conf ) {
+    settings.showmoonphase = showmoonphase_conf->value->int32;
+  } 
+
+  Tuple *moonposdegree_conf = dict_find(iter, MESSAGE_KEY_moonposdegree);
+  if( moonposdegree_conf ) {
+    settings.moonposdegree = moonposdegree_conf->value->int32;
+  } 
+
+  Tuple *moonpositionrim_conf = dict_find(iter, MESSAGE_KEY_moonpositionrim);
+  if( moonpositionrim_conf ) {
+    settings.moonpositionrim = moonpositionrim_conf->value->int32;
+  } 
+
+  Tuple *moonradius_conf = dict_find(iter, MESSAGE_KEY_moonradius);
+  if( moonradius_conf ) {
+    settings.moonradius = moonradius_conf->value->int32;
+  } 
+
+  Tuple *moonlightcolor_conf = dict_find(iter, MESSAGE_KEY_moonlightcolor);
+  if( moonlightcolor_conf ) {
+    settings.moonlightcolor = GColorFromHEX(moonlightcolor_conf->value->int32);
+  } 
+
+  Tuple *moondarkcolor_conf = dict_find(iter, MESSAGE_KEY_moondarkcolor);
+  if( moondarkcolor_conf ) {
+    settings.moondarkcolor = GColorFromHEX(moondarkcolor_conf->value->int32);
+  } 
+
+  Tuple *moonborder_conf = dict_find(iter, MESSAGE_KEY_moonborder);
+  if( moonborder_conf ) {
+    settings.moonborder = moonborder_conf->value->int32;
+  } 
+
+  Tuple *moonbordercolor_conf = dict_find(iter, MESSAGE_KEY_moonbordercolor);
+  if( moonbordercolor_conf ) {
+    settings.moonbordercolor = GColorFromHEX(moonbordercolor_conf->value->int32);
+  } 
+
+  Tuple *moonhemisphere_conf = dict_find(iter, MESSAGE_KEY_moonhemisphere);
+  if( moonhemisphere_conf ) {
+    settings.moonhemisphere = moonhemisphere_conf->value->int32;
   } 
   
   // read minute mark inner position setting
@@ -1116,6 +1215,110 @@ static void hands_update_proc(Layer *layer, GContext *ctx) {
   }  
 }
 
+// Computes a point at the given angle and percent distance from center.
+// When use_rect is false, 100% lands on an inscribed circle (classic round-face look).
+// When use_rect is true, 100% lands exactly on the physical case rim of a
+// rectangular display along that angle (Cartier-style markers reaching every edge).
+static GPoint mark_point(GPoint center, GRect bounds, int32_t angle, int32_t percent, bool use_rect) {
+  GPoint p;
+  if (use_rect) {
+    int32_t s = sin_lookup(angle);
+    int32_t c = -cos_lookup(angle);
+    int32_t abs_s = (s < 0) ? -s : s;
+    int32_t abs_c = (c < 0) ? -c : c;
+    int32_t half_w = bounds.size.w / 2;
+    int32_t half_h = bounds.size.h / 2;
+    // distance from center to the rectangle edge along this angle
+    int32_t t_w = (abs_s == 0) ? 0x7FFFFFFF : (int32_t)(((int64_t)half_w * TRIG_MAX_RATIO) / abs_s);
+    int32_t t_h = (abs_c == 0) ? 0x7FFFFFFF : (int32_t)(((int64_t)half_h * TRIG_MAX_RATIO) / abs_c);
+    int32_t t   = (t_w < t_h) ? t_w : t_h;
+    p.x = (int16_t)((((int64_t)s * t / TRIG_MAX_RATIO) * percent / 100)) + center.x;
+    p.y = (int16_t)((((int64_t)c * t / TRIG_MAX_RATIO) * percent / 100)) + center.y;
+  } else {
+    int32_t pos = bounds.size.w * percent / 200;
+    p.y = (int16_t)(-cos_lookup(angle) * (int32_t)pos / TRIG_MAX_RATIO) + center.y;
+    p.x = (int16_t)(sin_lookup(angle) * (int32_t)pos / TRIG_MAX_RATIO) + center.x;
+  }
+  return p;
+}
+
+// Computes the current moon phase and draws it as a small disc.
+// Phase is derived from the wall clock date using a fixed synodic month
+// length, no network/phone connection needed. angle 0/TRIG_MAX_RATIO = new
+// moon, TRIG_MAX_RATIO/2 = full moon (same fixed-point trig used elsewhere
+// in this file, so no floating point is needed).
+static void draw_moon_phase(GContext *ctx, GPoint moon_center, int32_t radius,
+                             GColor light, GColor dark, bool border, GColor border_color,
+                             bool southern) {
+  // Seconds of a known new moon (Jan 6 2000, 18:14 UTC) and the synodic
+  // month length in seconds (29.530588 days), both as fixed integers.
+  const int32_t reference_new_moon = 947182440;
+  const int32_t synodic_seconds    = 2551443;
+
+  time_t now = time(NULL);
+  int32_t elapsed = (int32_t)now - reference_new_moon;
+  int32_t age = elapsed % synodic_seconds;
+  if (age < 0) {
+    age += synodic_seconds;
+  }
+  // age/synodic_seconds is the phase fraction (0..1), expressed directly as
+  // a fixed-point angle so sin_lookup/cos_lookup can be used on it.
+  int32_t angle = (int32_t)(((int64_t)age * TRIG_MAX_RATIO) / synodic_seconds);
+
+  int32_t phase_cos = cos_lookup(angle);
+  // Terminator half-width: how far the day/night edge sits from the
+  // center, shrinking to 0 at the quarters and to +/-radius at new/full.
+  int32_t terminator_x = (int32_t)(((int64_t)radius * phase_cos) / TRIG_MAX_RATIO);
+
+  // Waxing (first half of the cycle) is lit on the right in the northern
+  // hemisphere; waning is lit on the left. Southern hemisphere mirrors it.
+  bool waxing = angle < (TRIG_MAX_RATIO / 2);
+  bool bright_right = waxing;
+  if (southern) {
+    bright_right = !bright_right;
+  }
+
+  GColor bright_color = light;
+  GColor dim_color    = dark;
+  // illuminated fraction < 0.5 while close to new moon (phase_cos > 0)
+  GColor ellipse_color = (phase_cos > 0) ? dark : light;
+
+  // Base: fill the whole disc dim, then the bright half on top.
+  graphics_context_set_fill_color(ctx, dim_color);
+  graphics_fill_circle(ctx, moon_center, (uint16_t)radius);
+
+  GPoint half_pts[13];
+  int32_t half_start = bright_right ? 0 : (TRIG_MAX_RATIO / 2);
+  for (int i = 0; i <= 12; i++) {
+    int32_t a = half_start + (int32_t)(((int64_t)i * (TRIG_MAX_RATIO / 2)) / 12);
+    half_pts[i].x = (int16_t)(((int64_t)radius * sin_lookup(a)) / TRIG_MAX_RATIO) + moon_center.x;
+    half_pts[i].y = (int16_t)(-((int64_t)radius * cos_lookup(a)) / TRIG_MAX_RATIO) + moon_center.y;
+  }
+  GPath half_path = { .num_points = 13, .points = half_pts, .rotation = 0, .offset = GPointZero };
+  graphics_context_set_fill_color(ctx, bright_color);
+  gpath_draw_filled(ctx, &half_path);
+
+  // Terminator: a full ellipse squeezed to |terminator_x|, on top of the
+  // half-and-half base. This alone is what turns it into a crescent or a
+  // gibbous shape instead of a plain half moon.
+  GPoint ellipse_pts[24];
+  int32_t ellipse_rx = (terminator_x < 0) ? -terminator_x : terminator_x;
+  for (int i = 0; i < 24; i++) {
+    int32_t a = (int32_t)(((int64_t)i * TRIG_MAX_RATIO) / 24);
+    ellipse_pts[i].x = (int16_t)(((int64_t)ellipse_rx * sin_lookup(a)) / TRIG_MAX_RATIO) + moon_center.x;
+    ellipse_pts[i].y = (int16_t)(-((int64_t)radius * cos_lookup(a)) / TRIG_MAX_RATIO) + moon_center.y;
+  }
+  GPath ellipse_path = { .num_points = 24, .points = ellipse_pts, .rotation = 0, .offset = GPointZero };
+  graphics_context_set_fill_color(ctx, ellipse_color);
+  gpath_draw_filled(ctx, &ellipse_path);
+
+  if (border) {
+    graphics_context_set_stroke_color(ctx, border_color);
+    graphics_context_set_stroke_width(ctx, 1);
+    graphics_draw_circle(ctx, moon_center, (uint16_t)radius);
+  }
+}
+
 static void dot_update_proc(Layer *layer, GContext *ctx) {
   
   GRect bounds  = layer_get_bounds(s_dot_layer);
@@ -1139,8 +1342,6 @@ static void dot_update_proc(Layer *layer, GContext *ctx) {
 
   // minute marks
   if( settings.showminsmark == 1 ) {
-    inner_pos = bounds.size.w*settings.minsmarkinnerpos/200;
-    outer_pos = bounds.size.w*settings.minsmarkouterpos/200;
     graphics_context_set_fill_color(ctx, settings.minsmarkcolor);
     graphics_context_set_stroke_color(ctx, settings.minsmarkcolor);
     graphics_context_set_stroke_width(ctx, settings.minsmarkthickness );
@@ -1149,10 +1350,8 @@ static void dot_update_proc(Layer *layer, GContext *ctx) {
       case 0: { 
 	      for (int i=0; i<=60; i+=1) {
 		      angle = DEG_TO_TRIGANGLE(i*6);
-	       	inner.y = (int16_t)(-cos_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.y;
-		      inner.x = (int16_t)(sin_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.x;
-		      outer.y = (int16_t)(-cos_lookup(angle) * (int32_t)outer_pos / TRIG_MAX_RATIO) + center.y;
-		      outer.x = (int16_t)(sin_lookup(angle) * (int32_t)outer_pos / TRIG_MAX_RATIO) + center.x;
+	      inner = mark_point(center, bounds, angle, settings.minsmarkinnerpos, settings.minsmarkrim);
+	      outer = mark_point(center, bounds, angle, settings.minsmarkouterpos, settings.minsmarkrim);
 		      // Draw tick mark
           graphics_draw_line(ctx, inner, outer);
         }  
@@ -1162,10 +1361,8 @@ static void dot_update_proc(Layer *layer, GContext *ctx) {
       case 1: { 
 	      for (int i=0; i<=60; i+=5) {
 		      angle = DEG_TO_TRIGANGLE(i*6);
-	       	inner.y = (int16_t)(-cos_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.y;
-		      inner.x = (int16_t)(sin_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.x;
-		      outer.y = (int16_t)(-cos_lookup(angle) * (int32_t)outer_pos / TRIG_MAX_RATIO) + center.y;
-		      outer.x = (int16_t)(sin_lookup(angle) * (int32_t)outer_pos / TRIG_MAX_RATIO) + center.x;
+	      inner = mark_point(center, bounds, angle, settings.minsmarkinnerpos, settings.minsmarkrim);
+	      outer = mark_point(center, bounds, angle, settings.minsmarkouterpos, settings.minsmarkrim);
 		      // Draw tick mark
           graphics_draw_line(ctx, inner, outer);
         }  
@@ -1175,10 +1372,8 @@ static void dot_update_proc(Layer *layer, GContext *ctx) {
       case 2: { 
 	      for (int i=0; i<=60; i+=15) {
 		      angle = DEG_TO_TRIGANGLE(i*6);
-	       	inner.y = (int16_t)(-cos_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.y;
-		      inner.x = (int16_t)(sin_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.x;
-		      outer.y = (int16_t)(-cos_lookup(angle) * (int32_t)outer_pos / TRIG_MAX_RATIO) + center.y;
-		      outer.x = (int16_t)(sin_lookup(angle) * (int32_t)outer_pos / TRIG_MAX_RATIO) + center.x;
+	      inner = mark_point(center, bounds, angle, settings.minsmarkinnerpos, settings.minsmarkrim);
+	      outer = mark_point(center, bounds, angle, settings.minsmarkouterpos, settings.minsmarkrim);
 		      // Draw tick mark
           graphics_draw_line(ctx, inner, outer);
         }  
@@ -1188,19 +1383,15 @@ static void dot_update_proc(Layer *layer, GContext *ctx) {
       case 3: { 
 	      for (int i=2; i<60; i+=5) {
 		      angle = DEG_TO_TRIGANGLE(i*6);
-	       	inner.y = (int16_t)(-cos_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.y;
-		      inner.x = (int16_t)(sin_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.x;
-		      outer.y = (int16_t)(-cos_lookup(angle) * (int32_t)outer_pos / TRIG_MAX_RATIO) + center.y;
-		      outer.x = (int16_t)(sin_lookup(angle) * (int32_t)outer_pos / TRIG_MAX_RATIO) + center.x;
+	      inner = mark_point(center, bounds, angle, settings.minsmarkinnerpos, settings.minsmarkrim);
+	      outer = mark_point(center, bounds, angle, settings.minsmarkouterpos, settings.minsmarkrim);
 		      // Draw tick mark
           graphics_draw_line(ctx, inner, outer);
         }  
 	      for (int i=3; i<60; i+=5) {
 		      angle = DEG_TO_TRIGANGLE(i*6);
-	       	inner.y = (int16_t)(-cos_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.y;
-		      inner.x = (int16_t)(sin_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.x;
-		      outer.y = (int16_t)(-cos_lookup(angle) * (int32_t)outer_pos / TRIG_MAX_RATIO) + center.y;
-		      outer.x = (int16_t)(sin_lookup(angle) * (int32_t)outer_pos / TRIG_MAX_RATIO) + center.x;
+	      inner = mark_point(center, bounds, angle, settings.minsmarkinnerpos, settings.minsmarkrim);
+	      outer = mark_point(center, bounds, angle, settings.minsmarkouterpos, settings.minsmarkrim);
 		      // Draw tick mark
           graphics_draw_line(ctx, inner, outer);
         }  
@@ -1210,37 +1401,29 @@ static void dot_update_proc(Layer *layer, GContext *ctx) {
       case 4: { 
 	      for (int i=2; i<14; i+=1) {
 		      angle = DEG_TO_TRIGANGLE(i*6);
-	       	inner.y = (int16_t)(-cos_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.y;
-		      inner.x = (int16_t)(sin_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.x;
-		      outer.y = (int16_t)(-cos_lookup(angle) * (int32_t)outer_pos / TRIG_MAX_RATIO) + center.y;
-		      outer.x = (int16_t)(sin_lookup(angle) * (int32_t)outer_pos / TRIG_MAX_RATIO) + center.x;
+	      inner = mark_point(center, bounds, angle, settings.minsmarkinnerpos, settings.minsmarkrim);
+	      outer = mark_point(center, bounds, angle, settings.minsmarkouterpos, settings.minsmarkrim);
 		      // Draw tick mark
           graphics_draw_line(ctx, inner, outer);
         }  
 	      for (int i=17; i<29; i+=1) {
 		      angle = DEG_TO_TRIGANGLE(i*6);
-	       	inner.y = (int16_t)(-cos_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.y;
-		      inner.x = (int16_t)(sin_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.x;
-		      outer.y = (int16_t)(-cos_lookup(angle) * (int32_t)outer_pos / TRIG_MAX_RATIO) + center.y;
-		      outer.x = (int16_t)(sin_lookup(angle) * (int32_t)outer_pos / TRIG_MAX_RATIO) + center.x;
+	      inner = mark_point(center, bounds, angle, settings.minsmarkinnerpos, settings.minsmarkrim);
+	      outer = mark_point(center, bounds, angle, settings.minsmarkouterpos, settings.minsmarkrim);
 		      // Draw tick mark
           graphics_draw_line(ctx, inner, outer);
         }  
 	      for (int i=32; i<44; i+=1) {
 		      angle = DEG_TO_TRIGANGLE(i*6);
-	       	inner.y = (int16_t)(-cos_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.y;
-		      inner.x = (int16_t)(sin_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.x;
-		      outer.y = (int16_t)(-cos_lookup(angle) * (int32_t)outer_pos / TRIG_MAX_RATIO) + center.y;
-		      outer.x = (int16_t)(sin_lookup(angle) * (int32_t)outer_pos / TRIG_MAX_RATIO) + center.x;
+	      inner = mark_point(center, bounds, angle, settings.minsmarkinnerpos, settings.minsmarkrim);
+	      outer = mark_point(center, bounds, angle, settings.minsmarkouterpos, settings.minsmarkrim);
 		      // Draw tick mark
           graphics_draw_line(ctx, inner, outer);
         }  
 	      for (int i=47; i<59; i+=1) {
 		      angle = DEG_TO_TRIGANGLE(i*6);
-	       	inner.y = (int16_t)(-cos_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.y;
-		      inner.x = (int16_t)(sin_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.x;
-		      outer.y = (int16_t)(-cos_lookup(angle) * (int32_t)outer_pos / TRIG_MAX_RATIO) + center.y;
-		      outer.x = (int16_t)(sin_lookup(angle) * (int32_t)outer_pos / TRIG_MAX_RATIO) + center.x;
+	      inner = mark_point(center, bounds, angle, settings.minsmarkinnerpos, settings.minsmarkrim);
+	      outer = mark_point(center, bounds, angle, settings.minsmarkouterpos, settings.minsmarkrim);
 		      // Draw tick mark
           graphics_draw_line(ctx, inner, outer);
         }  
@@ -1250,10 +1433,8 @@ static void dot_update_proc(Layer *layer, GContext *ctx) {
       case 5: { 
 	      for (int i=2; i<59; i+=15) {
 		      angle = DEG_TO_TRIGANGLE(i*6);
-	       	inner.y = (int16_t)(-cos_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.y;
-		      inner.x = (int16_t)(sin_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.x;
-		      outer.y = (int16_t)(-cos_lookup(angle) * (int32_t)outer_pos / TRIG_MAX_RATIO) + center.y;
-		      outer.x = (int16_t)(sin_lookup(angle) * (int32_t)outer_pos / TRIG_MAX_RATIO) + center.x;
+	      inner = mark_point(center, bounds, angle, settings.minsmarkinnerpos, settings.minsmarkrim);
+	      outer = mark_point(center, bounds, angle, settings.minsmarkouterpos, settings.minsmarkrim);
 		      // Draw tick mark
           graphics_draw_line(ctx, inner, outer);
         }  
@@ -1267,8 +1448,6 @@ static void dot_update_proc(Layer *layer, GContext *ctx) {
   
   // hour marks
   if( settings.showhourmark == 1 ) {
-    inner_pos = bounds.size.w*settings.hourmarkinnerpos/200;
-    outer_pos = bounds.size.w*settings.hourmarkouterpos/200;
     graphics_context_set_fill_color(ctx, settings.hourmarkcolor);
     graphics_context_set_stroke_color(ctx, settings.hourmarkcolor);
     graphics_context_set_stroke_width(ctx, settings.hourmarkthickness );
@@ -1277,10 +1456,8 @@ static void dot_update_proc(Layer *layer, GContext *ctx) {
       case 0: { 
 	      for (int i=0; i<=12; i+=1) {
 		      angle = DEG_TO_TRIGANGLE(i*30);
-		      inner.y = (int16_t)(-cos_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.y;
-		      inner.x = (int16_t)(sin_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.x;
-		      outer.y = (int16_t)(-cos_lookup(angle) * (int32_t)outer_pos / TRIG_MAX_RATIO) + center.y;
-		      outer.x = (int16_t)(sin_lookup(angle) * (int32_t)outer_pos / TRIG_MAX_RATIO) + center.x;
+		      inner = mark_point(center, bounds, angle, settings.hourmarkinnerpos, settings.hourmarkrim);
+		      outer = mark_point(center, bounds, angle, settings.hourmarkouterpos, settings.hourmarkrim);
 		      // Draw tick mark
           graphics_draw_line(ctx, inner, outer);
         }
@@ -1290,10 +1467,8 @@ static void dot_update_proc(Layer *layer, GContext *ctx) {
       case 1: { 
 	      for (int i=1; i<=12; i+=2) {
 		      angle = DEG_TO_TRIGANGLE(i*30);
-		      inner.y = (int16_t)(-cos_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.y;
-		      inner.x = (int16_t)(sin_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.x;
-		      outer.y = (int16_t)(-cos_lookup(angle) * (int32_t)outer_pos / TRIG_MAX_RATIO) + center.y;
-		      outer.x = (int16_t)(sin_lookup(angle) * (int32_t)outer_pos / TRIG_MAX_RATIO) + center.x;
+		      inner = mark_point(center, bounds, angle, settings.hourmarkinnerpos, settings.hourmarkrim);
+		      outer = mark_point(center, bounds, angle, settings.hourmarkouterpos, settings.hourmarkrim);
 		      // Draw tick mark
           graphics_draw_line(ctx, inner, outer);
         }
@@ -1303,10 +1478,8 @@ static void dot_update_proc(Layer *layer, GContext *ctx) {
       case 2: { 
 	      for (int i=0; i<=12; i+=2) {
 		      angle = DEG_TO_TRIGANGLE(i*30);
-		      inner.y = (int16_t)(-cos_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.y;
-		      inner.x = (int16_t)(sin_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.x;
-		      outer.y = (int16_t)(-cos_lookup(angle) * (int32_t)outer_pos / TRIG_MAX_RATIO) + center.y;
-		      outer.x = (int16_t)(sin_lookup(angle) * (int32_t)outer_pos / TRIG_MAX_RATIO) + center.x;
+		      inner = mark_point(center, bounds, angle, settings.hourmarkinnerpos, settings.hourmarkrim);
+		      outer = mark_point(center, bounds, angle, settings.hourmarkouterpos, settings.hourmarkrim);
 		      // Draw tick mark
           graphics_draw_line(ctx, inner, outer);
         }
@@ -1316,19 +1489,15 @@ static void dot_update_proc(Layer *layer, GContext *ctx) {
       case 3: { 
 	      for (int i=1; i<=12; i+=3) {
 		      angle = DEG_TO_TRIGANGLE(i*30);
-		      inner.y = (int16_t)(-cos_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.y;
-		      inner.x = (int16_t)(sin_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.x;
-		      outer.y = (int16_t)(-cos_lookup(angle) * (int32_t)outer_pos / TRIG_MAX_RATIO) + center.y;
-		      outer.x = (int16_t)(sin_lookup(angle) * (int32_t)outer_pos / TRIG_MAX_RATIO) + center.x;
+		      inner = mark_point(center, bounds, angle, settings.hourmarkinnerpos, settings.hourmarkrim);
+		      outer = mark_point(center, bounds, angle, settings.hourmarkouterpos, settings.hourmarkrim);
 		      // Draw tick mark
           graphics_draw_line(ctx, inner, outer);
         }
 	      for (int i=2; i<=12; i+=3) {
 		      angle = DEG_TO_TRIGANGLE(i*30);
-		      inner.y = (int16_t)(-cos_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.y;
-		      inner.x = (int16_t)(sin_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.x;
-		      outer.y = (int16_t)(-cos_lookup(angle) * (int32_t)outer_pos / TRIG_MAX_RATIO) + center.y;
-		      outer.x = (int16_t)(sin_lookup(angle) * (int32_t)outer_pos / TRIG_MAX_RATIO) + center.x;
+		      inner = mark_point(center, bounds, angle, settings.hourmarkinnerpos, settings.hourmarkrim);
+		      outer = mark_point(center, bounds, angle, settings.hourmarkouterpos, settings.hourmarkrim);
 		      // Draw tick mark
           graphics_draw_line(ctx, inner, outer);
         }
@@ -1338,10 +1507,8 @@ static void dot_update_proc(Layer *layer, GContext *ctx) {
       case 4: { 
 	      for (int i=1; i<12; i+=1) {
 		      angle = DEG_TO_TRIGANGLE(i*30);
-		      inner.y = (int16_t)(-cos_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.y;
-		      inner.x = (int16_t)(sin_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.x;
-		      outer.y = (int16_t)(-cos_lookup(angle) * (int32_t)outer_pos / TRIG_MAX_RATIO) + center.y;
-		      outer.x = (int16_t)(sin_lookup(angle) * (int32_t)outer_pos / TRIG_MAX_RATIO) + center.x;
+		      inner = mark_point(center, bounds, angle, settings.hourmarkinnerpos, settings.hourmarkrim);
+		      outer = mark_point(center, bounds, angle, settings.hourmarkouterpos, settings.hourmarkrim);
 		      // Draw tick mark
           graphics_draw_line(ctx, inner, outer);
         }
@@ -1352,7 +1519,6 @@ static void dot_update_proc(Layer *layer, GContext *ctx) {
   }
   
   if( settings.shownumbers == 1 ) {
-    inner_pos = bounds.size.w*settings.numberpos/200;
     graphics_context_set_text_color(ctx, settings.numbercolor);
     switch( settings.numberfont ) 
     {
@@ -1428,8 +1594,7 @@ static void dot_update_proc(Layer *layer, GContext *ctx) {
         for (int i=0; i<12; i+=1) 
         {
 	        angle = DEG_TO_TRIGANGLE(i*30);
-	        inner.y = (int16_t)(-cos_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.y;
-	        inner.x = (int16_t)(sin_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.x;
+        inner = mark_point(center, bounds, angle, settings.numberpos, settings.numberrim);
 	        // Draw number
           if( settings.numberset == 0 ) {
             graphics_draw_text(ctx, nums[i], font, GRect(inner.x-textsize, inner.y-(textsize/2)-2, 2*textsize, textsize), GTextOverflowModeFill, GTextAlignmentCenter, NULL);
@@ -1452,8 +1617,7 @@ static void dot_update_proc(Layer *layer, GContext *ctx) {
         for (int i=0; i<6; i+=1) 
         {
 	        angle = DEG_TO_TRIGANGLE(i*60);
-	        inner.y = (int16_t)(-cos_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.y;
-	        inner.x = (int16_t)(sin_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.x;
+        inner = mark_point(center, bounds, angle, settings.numberpos, settings.numberrim);
 	        // Draw number
           if( settings.numberset == 0 ) {
             graphics_draw_text(ctx, nums[i], font, GRect(inner.x-textsize, inner.y-(textsize/2)-2, 2*textsize, textsize), GTextOverflowModeFill, GTextAlignmentCenter, NULL);
@@ -1476,8 +1640,7 @@ static void dot_update_proc(Layer *layer, GContext *ctx) {
         for (int i=0; i<6; i+=1) 
         {
 	        angle = DEG_TO_TRIGANGLE((i*60)+30);
-	        inner.y = (int16_t)(-cos_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.y;
-	        inner.x = (int16_t)(sin_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.x;
+        inner = mark_point(center, bounds, angle, settings.numberpos, settings.numberrim);
 	        // Draw number
           if( settings.numberset == 0 ) {
             graphics_draw_text(ctx, nums[i], font, GRect(inner.x-textsize, inner.y-(textsize/2)-2, 2*textsize, textsize), GTextOverflowModeFill, GTextAlignmentCenter, NULL);
@@ -1500,8 +1663,7 @@ static void dot_update_proc(Layer *layer, GContext *ctx) {
         for (int i=0; i<4; i+=1) 
         {
 	        angle = DEG_TO_TRIGANGLE(i*90);
-	        inner.y = (int16_t)(-cos_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.y;
-	        inner.x = (int16_t)(sin_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.x;
+        inner = mark_point(center, bounds, angle, settings.numberpos, settings.numberrim);
 	        // Draw number
           if( settings.numberset == 0 ) {
             graphics_draw_text(ctx, nums[i], font, GRect(inner.x-textsize, inner.y-(textsize/2)-2, 2*textsize, textsize), GTextOverflowModeFill, GTextAlignmentCenter, NULL);
@@ -1524,8 +1686,7 @@ static void dot_update_proc(Layer *layer, GContext *ctx) {
         for (int i=0; i<3; i+=1) 
         {
 	        angle = DEG_TO_TRIGANGLE(i*90);
-	        inner.y = (int16_t)(-cos_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.y;
-	        inner.x = (int16_t)(sin_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.x;
+        inner = mark_point(center, bounds, angle, settings.numberpos, settings.numberrim);
 	        // Draw number
           if( settings.numberset == 0 ) {
             graphics_draw_text(ctx, nums[i], font, GRect(inner.x-textsize, inner.y-(textsize/2)-2, 2*textsize, textsize), GTextOverflowModeFill, GTextAlignmentCenter, NULL);
@@ -1548,8 +1709,7 @@ static void dot_update_proc(Layer *layer, GContext *ctx) {
         for (int i=0; i<3; i+=1) 
         {
 	        angle = DEG_TO_TRIGANGLE((i*90)+180);
-	        inner.y = (int16_t)(-cos_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.y;
-	        inner.x = (int16_t)(sin_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.x;
+        inner = mark_point(center, bounds, angle, settings.numberpos, settings.numberrim);
 	        // Draw number
           if( settings.numberset == 0 ) {
             graphics_draw_text(ctx, nums[i], font, GRect(inner.x-textsize, inner.y-(textsize/2)-2, 2*textsize, textsize), GTextOverflowModeFill, GTextAlignmentCenter, NULL);
@@ -1572,8 +1732,7 @@ static void dot_update_proc(Layer *layer, GContext *ctx) {
         for (int i=0; i<3; i+=1) 
         {
 	        angle = DEG_TO_TRIGANGLE((i*90)+270);
-	        inner.y = (int16_t)(-cos_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.y;
-	        inner.x = (int16_t)(sin_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.x;
+        inner = mark_point(center, bounds, angle, settings.numberpos, settings.numberrim);
 	        // Draw number
           if( settings.numberset == 0 ) {
             graphics_draw_text(ctx, nums[i], font, GRect(inner.x-textsize, inner.y-(textsize/2)-2, 2*textsize, textsize), GTextOverflowModeFill, GTextAlignmentCenter, NULL);
@@ -1596,8 +1755,7 @@ static void dot_update_proc(Layer *layer, GContext *ctx) {
         for (int i=0; i<3; i+=1) 
         {
 	        angle = DEG_TO_TRIGANGLE((i*90)+90);
-	        inner.y = (int16_t)(-cos_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.y;
-	        inner.x = (int16_t)(sin_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.x;
+        inner = mark_point(center, bounds, angle, settings.numberpos, settings.numberrim);
 	        // Draw number
           if( settings.numberset == 0 ) {
             graphics_draw_text(ctx, nums[i], font, GRect(inner.x-textsize, inner.y-(textsize/2)-2, 2*textsize, textsize), GTextOverflowModeFill, GTextAlignmentCenter, NULL);
@@ -1620,8 +1778,7 @@ static void dot_update_proc(Layer *layer, GContext *ctx) {
         for (int i=0; i<2; i+=1) 
         {
 	        angle = DEG_TO_TRIGANGLE(i*180);
-	        inner.y = (int16_t)(-cos_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.y;
-	        inner.x = (int16_t)(sin_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.x;
+        inner = mark_point(center, bounds, angle, settings.numberpos, settings.numberrim);
 	        // Draw number
           if( settings.numberset == 0 ) {
             graphics_draw_text(ctx, nums[i], font, GRect(inner.x-textsize, inner.y-(textsize/2)-2, 2*textsize, textsize), GTextOverflowModeFill, GTextAlignmentCenter, NULL);
@@ -1644,8 +1801,7 @@ static void dot_update_proc(Layer *layer, GContext *ctx) {
         for (int i=0; i<2; i+=1) 
         {
 	        angle = DEG_TO_TRIGANGLE((i*180)+90);
-	        inner.y = (int16_t)(-cos_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.y;
-	        inner.x = (int16_t)(sin_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.x;
+        inner = mark_point(center, bounds, angle, settings.numberpos, settings.numberrim);
 	        // Draw number
           if( settings.numberset == 0 ) {
             graphics_draw_text(ctx, nums[i], font, GRect(inner.x-textsize, inner.y-(textsize/2)-2, 2*textsize, textsize), GTextOverflowModeFill, GTextAlignmentCenter, NULL);
@@ -1658,8 +1814,7 @@ static void dot_update_proc(Layer *layer, GContext *ctx) {
       // only twelve as digit
       case 10: {
         angle = DEG_TO_TRIGANGLE(0);
-        inner.y = (int16_t)(-cos_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.y;
-        inner.x = (int16_t)(sin_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.x;
+        inner = mark_point(center, bounds, angle, settings.numberpos, settings.numberrim);
         // Draw number
         if( settings.numberset == 0 ) {
           graphics_draw_text(ctx, "12", font, GRect(inner.x-textsize, inner.y-(textsize/2)-2, 2*textsize, textsize), GTextOverflowModeFill, GTextAlignmentCenter, NULL);
@@ -1672,6 +1827,17 @@ static void dot_update_proc(Layer *layer, GContext *ctx) {
     }  
   }
   
+  // moon phase
+  if( settings.showmoonphase == 1 ) {
+    angle = DEG_TO_TRIGANGLE(settings.moonposdegree);
+    inner_pos = bounds.size.w*settings.moonpositionrim/200;
+    inner.y = (int16_t)(-cos_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.y;
+    inner.x = (int16_t)(sin_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.x;
+
+    draw_moon_phase(ctx, inner, settings.moonradius, settings.moonlightcolor, settings.moondarkcolor,
+                     settings.moonborder == 1, settings.moonbordercolor, settings.moonhemisphere == 1);
+  }
+
   if( settings.fullscreen == 0 ) {
     graphics_context_set_stroke_color(ctx, GColorBlack);
     graphics_context_set_stroke_width(ctx, 3 );

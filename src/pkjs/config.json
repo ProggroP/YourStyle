@@ -12,86 +12,100 @@
     "items": [
       {
         "type": "heading",
-        "defaultValue": "Color Settings"
+        "defaultValue": "Color Settings",
+        "id": "heading-colors"
       },
       {
         "type": "text",
-        "defaultValue": "Choose from all available colors."
+        "defaultValue": "Choose from all available colors.",
+        "group": "colors"
       },
       {
         "type": "color",
         "sunlight": false,
         "messageKey": "backcolor",
         "defaultValue": "0xFFFFFF",
-        "label": "Background Color"
+        "label": "Background Color",
+        "group": "colors"
       },
       {
         "type": "text",
-        "defaultValue": "<p style='color:lightblue'>HAND COLOR</p>"
+        "defaultValue": "<p style='color:lightblue'>HAND COLOR</p>",
+        "group": "colors"
       },
       {
         "type": "color",
         "sunlight": false,
         "messageKey": "hourdialcolor",
         "defaultValue": "0x000000",
-        "label": "Color of the Hour Hand"
+        "label": "Color of the Hour Hand",
+        "group": "colors"
       },
       {
         "type": "color",
         "sunlight": false,
         "messageKey": "minsdialcolor",
         "defaultValue": "0x000000",
-        "label": "Color of the Minutes Hand"
+        "label": "Color of the Minutes Hand",
+        "group": "colors"
       },
       {
         "type": "color",
         "sunlight": false,
         "messageKey": "secsdialcolor",
         "defaultValue": "0x000000",
-        "label": "Color of the Seconds Hand"
+        "label": "Color of the Seconds Hand",
+        "group": "colors"
       },
       {
         "type": "text",
-        "defaultValue": "<p style='color:lightblue'>HAND FILLING COLOR</p>"
+        "defaultValue": "<p style='color:lightblue'>HAND FILLING COLOR</p>",
+        "group": "colors"
       },
       {
         "type": "color",
         "sunlight": false,
         "messageKey": "hourfillcolor",
         "defaultValue": "0x000000",
-        "label": "Color of the Hour Hand Filling"
+        "label": "Color of the Hour Hand Filling",
+        "group": "colors"
       },
       {
         "type": "color",
         "sunlight": false,
         "messageKey": "minsfillcolor",
         "defaultValue": "0x000000",
-        "label": "Color of the Minutes Hand Filling"
+        "label": "Color of the Minutes Hand Filling",
+        "group": "colors"
       },
       {
         "type": "color",
         "sunlight": false,
         "messageKey": "secsfillcolor",
         "defaultValue": "0x000000",
-        "label": "Color of the Seconds Hand Filling"
+        "label": "Color of the Seconds Hand Filling",
+        "group": "colors"
       },
       {
         "type": "text",
-        "defaultValue": "<p style='color:lightblue'>MARK COLOR</p>"
+        "defaultValue": "<p style='color:lightblue'>MARK COLOR</p>",
+        "group": "colors"
       },
       {
         "type": "color",
         "sunlight": false,
         "messageKey": "hourmarkcolor",
         "defaultValue": "0x000000",
-        "label": "Color of the Hour Marks"
+        "label": "Color of the Hour Marks",
+        "group": "colors"
       },
       {
         "type": "color",
         "sunlight": false,
         "messageKey": "minsmarkcolor",
         "defaultValue": "0x000000",
-        "label": "Color of the Minute Marks"
+        "label": "Color of the Minute Marks",
+        "group": "colors"
       }
     ]
   },
@@ -100,15 +114,18 @@
     "items": [
       {
         "type": "heading",
-        "defaultValue": "Length Settings"
+        "defaultValue": "Length Settings",
+        "id": "heading-lengths"
       },
       {
         "type": "text",
-        "defaultValue": "100 means full length from the center to the rim."
+        "defaultValue": "100 means full length from the center to the rim.",
+        "group": "lengths"
       },
       {
         "type": "text",
-        "defaultValue": "<p style='color:lightblue'>HAND LENGTH</p>"
+        "defaultValue": "<p style='color:lightblue'>HAND LENGTH</p>",
+        "group": "lengths"
       },
       {
         "type": "slider",
@@ -117,7 +134,8 @@
         "label": "Hour Hand",
         "min": 0,
         "max": 100,
-        "step": 1
+        "step": 1,
+        "group": "lengths"
       },
       {
         "type": "slider",
@@ -126,7 +144,8 @@
         "label": "Minute Hand",
         "min": 0,
         "max": 100,
-        "step": 1
+        "step": 1,
+        "group": "lengths"
       },
       {
         "type": "slider",
@@ -135,11 +154,13 @@
         "label": "Seconds Hand",
         "min": 0,
         "max": 100,
-        "step": 1
+        "step": 1,
+        "group": "lengths"
       },
       {
         "type": "text",
-        "defaultValue": "<p style='color:lightblue'>COUNTERBALANCE LENGTH</p>"
+        "defaultValue": "<p style='color:lightblue'>COUNTERBALANCE LENGTH</p>",
+        "group": "lengths"
       },
       {
         "type": "slider",
@@ -148,7 +169,8 @@
         "label": "Hour Hand",
         "min": 0,
         "max": 100,
-        "step": 1
+        "step": 1,
+        "group": "lengths"
       },
       {
         "type": "slider",
@@ -157,7 +179,8 @@
         "label": "Minute Hand",
         "min": 0,
         "max": 100,
-        "step": 1
+        "step": 1,
+        "group": "lengths"
       },
       {
         "type": "slider",
@@ -166,7 +189,8 @@
         "label": "Seconds Hand",
         "min": 0,
         "max": 100,
-        "step": 1
+        "step": 1,
+        "group": "lengths"
       }
     ]
   },
@@ -175,15 +199,18 @@
     "items": [
       {
         "type": "heading",
-        "defaultValue": "Position of the Hand Fillings"
+        "defaultValue": "Position of the Hand Fillings",
+        "id": "heading-fillpos"
       },
       {
         "type": "text",
-        "defaultValue": "0 means center, 100 means outer rim."
+        "defaultValue": "0 means center, 100 means outer rim.",
+        "group": "fillpos"
       },
       {
         "type": "text",
-        "defaultValue": "<p style='color:lightblue'>HOUR HAND</p>"
+        "defaultValue": "<p style='color:lightblue'>HOUR HAND</p>",
+        "group": "fillpos"
       },
       {
         "type": "slider",
@@ -192,7 +219,8 @@
         "label": "Start Position",
         "min": 0,
         "max": 100,
-        "step": 1
+        "step": 1,
+        "group": "fillpos"
       },
       {
         "type": "slider",
@@ -201,11 +229,13 @@
         "label": "End Position",
         "min": 0,
         "max": 100,
-        "step": 1
+        "step": 1,
+        "group": "fillpos"
       },
       {
         "type": "text",
-        "defaultValue": "<p style='color:lightblue'>MINUTE HAND</p>"
+        "defaultValue": "<p style='color:lightblue'>MINUTE HAND</p>",
+        "group": "fillpos"
       },
       {
         "type": "slider",
@@ -214,7 +244,8 @@
         "label": "Start Position",
         "min": 0,
         "max": 100,
-        "step": 1
+        "step": 1,
+        "group": "fillpos"
       },
       {
         "type": "slider",
@@ -223,11 +254,13 @@
         "label": "End Position",
         "min": 0,
         "max": 100,
-        "step": 1
+        "step": 1,
+        "group": "fillpos"
       },
       {
         "type": "text",
-        "defaultValue": "<p style='color:lightblue'>SECONDS HAND</p>"
+        "defaultValue": "<p style='color:lightblue'>SECONDS HAND</p>",
+        "group": "fillpos"
       },
       {
         "type": "slider",
@@ -236,7 +269,8 @@
         "label": "Start Position",
         "min": 0,
         "max": 100,
-        "step": 1
+        "step": 1,
+        "group": "fillpos"
       },
       {
         "type": "slider",
@@ -245,7 +279,8 @@
         "label": "End Position",
         "min": 0,
         "max": 100,
-        "step": 1
+        "step": 1,
+        "group": "fillpos"
       }
     ]
   },
@@ -254,15 +289,18 @@
     "items": [
       {
         "type": "heading",
-        "defaultValue": "Position of the Marks"
+        "defaultValue": "Position of the Marks",
+        "id": "heading-markpos"
       },
       {
         "type": "text",
-        "defaultValue": "0 means center, 100 means outer rim."
+        "defaultValue": "0 means center, 100 means outer rim.",
+        "group": "markpos"
       },
       {
         "type": "text",
-        "defaultValue": "<p style='color:lightblue'>HOUR MARK</p>"
+        "defaultValue": "<p style='color:lightblue'>HOUR MARK</p>",
+        "group": "markpos"
       },
       {
         "type": "slider",
@@ -271,7 +309,8 @@
         "label": "Start Position",
         "min": 0,
         "max": 100,
-        "step": 1
+        "step": 1,
+        "group": "markpos"
       },
       {
         "type": "slider",
@@ -280,11 +319,13 @@
         "label": "End Position",
         "min": 0,
         "max": 100,
-        "step": 1
+        "step": 1,
+        "group": "markpos"
       },
       {
         "type": "text",
-        "defaultValue": "<p style='color:lightblue'>MINUTE MARK</p>"
+        "defaultValue": "<p style='color:lightblue'>MINUTE MARK</p>",
+        "group": "markpos"
       },
       {
         "type": "slider",
@@ -293,7 +334,8 @@
         "label": "Start Position",
         "min": 0,
         "max": 100,
-        "step": 1
+        "step": 1,
+        "group": "markpos"
       },
       {
         "type": "slider",
@@ -302,7 +344,8 @@
         "label": "End Position",
         "min": 0,
         "max": 100,
-        "step": 1
+        "step": 1,
+        "group": "markpos"
       }
     ]
   },
@@ -311,7 +354,8 @@
     "items": [
       {
         "type": "heading",
-        "defaultValue": "Hour Mark Style"
+        "defaultValue": "Hour Mark Style",
+        "id": "heading-hourmarkstyle"
       },
       {
         "type": "radiogroup",
@@ -319,12 +363,40 @@
         "label": "Select Style",
         "defaultValue": "0",
         "options": [
-          { "label": "All Marks", "value": "0" },
-          { "label": "Show even hours (2, 4, 6, ...)", "value": "1" },
-          { "label": "Show odd hours (1, 3, 5, ...)", "value": "2" },
-          { "label": "Gaps between 4 hour numbers", "value": "3" },
-          { "label": "All except 12 o'clock", "value": "4" }
-        ]
+          {
+            "label": "All Marks",
+            "value": "0"
+          },
+          {
+            "label": "Show even hours (2, 4, 6, ...)",
+            "value": "1"
+          },
+          {
+            "label": "Show odd hours (1, 3, 5, ...)",
+            "value": "2"
+          },
+          {
+            "label": "Gaps between 4 hour numbers",
+            "value": "3"
+          },
+          {
+            "label": "All except 12 o'clock",
+            "value": "4"
+          }
+        ],
+        "group": "hourmarkstyle"
+      },
+      {
+        "type": "toggle",
+        "messageKey": "hourmarkrim",
+        "defaultValue": false,
+        "label": "Extend marks to case rim (rectangular watches)",
+        "group": "hourmarkstyle"
+      },
+      {
+        "type": "text",
+        "defaultValue": "On rectangular watches, hour marks reach the actual edge of the display at every angle instead of an inscribed circle, similar to a Cartier-style dial. Has no visible effect on round displays.",
+        "group": "hourmarkstyle"
       }
     ]
   },
@@ -333,7 +405,8 @@
     "items": [
       {
         "type": "heading",
-        "defaultValue": "Minute Mark Style"
+        "defaultValue": "Minute Mark Style",
+        "id": "heading-minutemarkstyle"
       },
       {
         "type": "radiogroup",
@@ -341,13 +414,39 @@
         "label": "Select Style",
         "defaultValue": "0",
         "options": [
-          { "label": "All Marks", "value": "0" },
-          { "label": "Every 5th minute", "value": "1" },
-          { "label": "Every 15th minute", "value": "2" },
-          { "label": "Gap around all hour marks", "value": "3" },
-          { "label": "Gap around 12, 3, 6, 9", "value": "4" },
-          { "label": "Gap around 12 only", "value": "5" }
-        ]
+          {
+            "label": "All Marks",
+            "value": "0"
+          },
+          {
+            "label": "Every 5th minute",
+            "value": "1"
+          },
+          {
+            "label": "Every 15th minute",
+            "value": "2"
+          },
+          {
+            "label": "Gap around all hour marks",
+            "value": "3"
+          },
+          {
+            "label": "Gap around 12, 3, 6, 9",
+            "value": "4"
+          },
+          {
+            "label": "Gap around 12 only",
+            "value": "5"
+          }
+        ],
+        "group": "minutemarkstyle"
+      },
+      {
+        "type": "toggle",
+        "messageKey": "minsmarkrim",
+        "defaultValue": false,
+        "label": "Extend marks to case rim (rectangular watches)",
+        "group": "minutemarkstyle"
       }
     ]
   },
@@ -356,13 +455,15 @@
     "items": [
       {
         "type": "heading",
-        "defaultValue": "Hour Number Settings"
+        "defaultValue": "Hour Number Settings",
+        "id": "heading-numbers"
       },
       {
         "type": "toggle",
         "messageKey": "shownumbers",
         "defaultValue": false,
-        "label": "Enable Hour Numbers"
+        "label": "Enable Hour Numbers",
+        "group": "numbers"
       },
       {
         "type": "radiogroup",
@@ -370,17 +471,48 @@
         "label": "Select Font Size",
         "defaultValue": "0",
         "options": [
-          { "label": "9 pt.", "value": "0" },
-          { "label": "14 pt.", "value": "1" },
-          { "label": "14 pt. bold", "value": "2" },
-          { "label": "18 pt.", "value": "3" },
-          { "label": "18 pt. bold", "value": "4" },
-          { "label": "24 pt.", "value": "5" },
-          { "label": "24 pt. bold", "value": "6" },
-          { "label": "28 pt.", "value": "7" },
-          { "label": "28 pt. bold", "value": "8" },
-          { "label": "30 pt. black", "value": "9" }
-        ]
+          {
+            "label": "9 pt.",
+            "value": "0"
+          },
+          {
+            "label": "14 pt.",
+            "value": "1"
+          },
+          {
+            "label": "14 pt. bold",
+            "value": "2"
+          },
+          {
+            "label": "18 pt.",
+            "value": "3"
+          },
+          {
+            "label": "18 pt. bold",
+            "value": "4"
+          },
+          {
+            "label": "24 pt.",
+            "value": "5"
+          },
+          {
+            "label": "24 pt. bold",
+            "value": "6"
+          },
+          {
+            "label": "28 pt.",
+            "value": "7"
+          },
+          {
+            "label": "28 pt. bold",
+            "value": "8"
+          },
+          {
+            "label": "30 pt. black",
+            "value": "9"
+          }
+        ],
+        "group": "numbers"
       },
       {
         "type": "radiogroup",
@@ -388,18 +520,52 @@
         "label": "Select Number Selection",
         "defaultValue": "0",
         "options": [
-          { "label": "All Numbers", "value": "0" },
-          { "label": "Show even numbers", "value": "1" },
-          { "label": "Show odd numbers", "value": "2" },
-          { "label": "4 Numbers (12, 3, 6, 9)", "value": "3" },
-          { "label": "3 Numbers (12, 3, 6)", "value": "4" },
-          { "label": "3 Numbers (12, 6, 9)", "value": "5" },
-          { "label": "3 Numbers (12, 3, 9)", "value": "6" },
-          { "label": "3 Numbers (3, 6, 9)", "value": "7" },
-          { "label": "2 Numbers (12, 6)", "value": "8" },
-          { "label": "2 Numbers (3, 9)", "value": "9" },
-          { "label": "12 only", "value": "10" }
-        ]
+          {
+            "label": "All Numbers",
+            "value": "0"
+          },
+          {
+            "label": "Show even numbers",
+            "value": "1"
+          },
+          {
+            "label": "Show odd numbers",
+            "value": "2"
+          },
+          {
+            "label": "4 Numbers (12, 3, 6, 9)",
+            "value": "3"
+          },
+          {
+            "label": "3 Numbers (12, 3, 6)",
+            "value": "4"
+          },
+          {
+            "label": "3 Numbers (12, 6, 9)",
+            "value": "5"
+          },
+          {
+            "label": "3 Numbers (12, 3, 9)",
+            "value": "6"
+          },
+          {
+            "label": "3 Numbers (3, 6, 9)",
+            "value": "7"
+          },
+          {
+            "label": "2 Numbers (12, 6)",
+            "value": "8"
+          },
+          {
+            "label": "2 Numbers (3, 9)",
+            "value": "9"
+          },
+          {
+            "label": "12 only",
+            "value": "10"
+          }
+        ],
+        "group": "numbers"
       },
       {
         "type": "radiogroup",
@@ -407,9 +573,16 @@
         "label": "Select Format",
         "defaultValue": "0",
         "options": [
-          { "label": "Arabic", "value": "0" },
-          { "label": "Roman", "value": "1" }
-        ]
+          {
+            "label": "Arabic",
+            "value": "0"
+          },
+          {
+            "label": "Roman",
+            "value": "1"
+          }
+        ],
+        "group": "numbers"
       },
       {
         "type": "slider",
@@ -418,18 +591,33 @@
         "label": "Position (0 = center, 100 = rim)",
         "min": 0,
         "max": 100,
-        "step": 1
+        "step": 1,
+        "group": "numbers"
+      },
+      {
+        "type": "toggle",
+        "messageKey": "numberrim",
+        "defaultValue": false,
+        "label": "Position relative to case rim (rectangular watches)",
+        "group": "numbers"
       },
       {
         "type": "text",
-        "defaultValue": "<p style='color:lightblue'>NUMBER COLOR</p>"
+        "defaultValue": "On rectangular watches, 100 becomes the actual edge of the display instead of an inscribed circle. Lower the Position slider if numbers get clipped near the corners.",
+        "group": "numbers"
+      },
+      {
+        "type": "text",
+        "defaultValue": "<p style='color:lightblue'>NUMBER COLOR</p>",
+        "group": "numbers"
       },
       {
         "type": "color",
         "sunlight": false,
         "messageKey": "numbercolor",
         "defaultValue": "0xFFFFFF",
-        "label": "Text Color"
+        "label": "Text Color",
+        "group": "numbers"
       }
     ]
   },
@@ -438,11 +626,13 @@
     "items": [
       {
         "type": "heading",
-        "defaultValue": "Thickness Settings"
+        "defaultValue": "Thickness Settings",
+        "id": "heading-thickness"
       },
       {
         "type": "text",
-        "defaultValue": "<p style='color:lightblue'>HOUR HAND</p>"
+        "defaultValue": "<p style='color:lightblue'>HOUR HAND</p>",
+        "group": "thickness"
       },
       {
         "type": "slider",
@@ -451,7 +641,8 @@
         "label": "Hand",
         "min": 1,
         "max": 31,
-        "step": 2
+        "step": 2,
+        "group": "thickness"
       },
       {
         "type": "slider",
@@ -460,11 +651,13 @@
         "label": "Filling",
         "min": 1,
         "max": 31,
-        "step": 2
+        "step": 2,
+        "group": "thickness"
       },
       {
         "type": "text",
-        "defaultValue": "<p style='color:lightblue'>MINUTE HAND</p>"
+        "defaultValue": "<p style='color:lightblue'>MINUTE HAND</p>",
+        "group": "thickness"
       },
       {
         "type": "slider",
@@ -473,7 +666,8 @@
         "label": "Hand",
         "min": 1,
         "max": 31,
-        "step": 2
+        "step": 2,
+        "group": "thickness"
       },
       {
         "type": "slider",
@@ -482,11 +676,13 @@
         "label": "Filling",
         "min": 1,
         "max": 31,
-        "step": 2
+        "step": 2,
+        "group": "thickness"
       },
       {
         "type": "text",
-        "defaultValue": "<p style='color:lightblue'>SECONDS HAND</p>"
+        "defaultValue": "<p style='color:lightblue'>SECONDS HAND</p>",
+        "group": "thickness"
       },
       {
         "type": "slider",
@@ -495,7 +691,8 @@
         "label": "Hand",
         "min": 1,
         "max": 31,
-        "step": 2
+        "step": 2,
+        "group": "thickness"
       },
       {
         "type": "slider",
@@ -504,11 +701,13 @@
         "label": "Filling",
         "min": 1,
         "max": 31,
-        "step": 2
+        "step": 2,
+        "group": "thickness"
       },
       {
         "type": "text",
-        "defaultValue": "<p style='color:lightblue'>MARKS</p>"
+        "defaultValue": "<p style='color:lightblue'>MARKS</p>",
+        "group": "thickness"
       },
       {
         "type": "slider",
@@ -517,7 +716,8 @@
         "label": "Hour Mark",
         "min": 1,
         "max": 21,
-        "step": 2
+        "step": 2,
+        "group": "thickness"
       },
       {
         "type": "slider",
@@ -526,7 +726,8 @@
         "label": "Minute Mark",
         "min": 1,
         "max": 21,
-        "step": 2
+        "step": 2,
+        "group": "thickness"
       }
     ]
   },
@@ -535,12 +736,14 @@
     "items": [
       {
         "type": "heading",
-        "defaultValue": "Date Settings"
+        "defaultValue": "Date Settings",
+        "id": "heading-date"
       },
       {
         "type": "toggle",
         "messageKey": "date",
-        "label": "Enable Date Display"
+        "label": "Enable Date Display",
+        "group": "date"
       },
       {
         "type": "radiogroup",
@@ -548,9 +751,16 @@
         "label": "Shape",
         "defaultValue": "0",
         "options": [
-          { "label": "Round", "value": "0" },
-          { "label": "Square", "value": "1" }
-        ]
+          {
+            "label": "Round",
+            "value": "0"
+          },
+          {
+            "label": "Square",
+            "value": "1"
+          }
+        ],
+        "group": "date"
       },
       {
         "type": "slider",
@@ -559,7 +769,8 @@
         "label": "Position (degree)",
         "min": 0,
         "max": 360,
-        "step": 5
+        "step": 5,
+        "group": "date"
       },
       {
         "type": "slider",
@@ -568,7 +779,8 @@
         "label": "Position (0 = center, 100 = rim)",
         "min": 0,
         "max": 100,
-        "step": 1
+        "step": 1,
+        "group": "date"
       },
       {
         "type": "radiogroup",
@@ -576,31 +788,44 @@
         "label": "Size",
         "defaultValue": "1",
         "options": [
-          { "label": "Small", "value": "0" },
-          { "label": "Regular", "value": "1" },
-          { "label": "Large", "value": "2" }
-        ]
+          {
+            "label": "Small",
+            "value": "0"
+          },
+          {
+            "label": "Regular",
+            "value": "1"
+          },
+          {
+            "label": "Large",
+            "value": "2"
+          }
+        ],
+        "group": "date"
       },
       {
         "type": "color",
         "sunlight": false,
         "messageKey": "datetextcolor",
         "defaultValue": "0x000000",
-        "label": "Text Color"
+        "label": "Text Color",
+        "group": "date"
       },
       {
         "type": "color",
         "sunlight": false,
         "messageKey": "datebackcolor",
         "defaultValue": "0xFFFFFF",
-        "label": "Background Color"
+        "label": "Background Color",
+        "group": "date"
       },
       {
         "type": "color",
         "sunlight": false,
         "messageKey": "datebordercolor",
         "defaultValue": "0xFFFFFF",
-        "label": "Rim Color"
+        "label": "Rim Color",
+        "group": "date"
       }
     ]
   },
@@ -609,26 +834,30 @@
     "items": [
       {
         "type": "heading",
-        "defaultValue": "Bluetooth Settings"
+        "defaultValue": "Bluetooth Settings",
+        "id": "heading-bluetooth"
       },
       {
         "type": "toggle",
         "messageKey": "bluetooth",
         "defaultValue": false,
-        "label": "Enable Bluetooth Display"
+        "label": "Enable Bluetooth Display",
+        "group": "bluetooth"
       },
       {
         "type": "toggle",
         "messageKey": "btalways",
         "label": "Always On",
         "defaultValue": true,
-        "description": "Switch off while positioning in order to see result."
+        "description": "Switch off while positioning in order to see result.",
+        "group": "bluetooth"
       },
       {
         "type": "toggle",
         "messageKey": "btvibe",
         "label": "Vibe On Disconnect",
-        "defaultValue": false
+        "defaultValue": false,
+        "group": "bluetooth"
       },
       {
         "type": "radiogroup",
@@ -636,9 +865,16 @@
         "label": "Shape",
         "defaultValue": "0",
         "options": [
-          { "label": "Round", "value": "0" },
-          { "label": "Square", "value": "1" }
-        ]
+          {
+            "label": "Round",
+            "value": "0"
+          },
+          {
+            "label": "Square",
+            "value": "1"
+          }
+        ],
+        "group": "bluetooth"
       },
       {
         "type": "slider",
@@ -647,7 +883,8 @@
         "label": "Position (degree)",
         "min": 0,
         "max": 360,
-        "step": 5
+        "step": 5,
+        "group": "bluetooth"
       },
       {
         "type": "slider",
@@ -656,7 +893,8 @@
         "label": "Position (0 = center, 100 = rim)",
         "min": 0,
         "max": 100,
-        "step": 1
+        "step": 1,
+        "group": "bluetooth"
       },
       {
         "type": "radiogroup",
@@ -664,60 +902,78 @@
         "label": "Size",
         "defaultValue": "1",
         "options": [
-          { "label": "Small", "value": "0" },
-          { "label": "Regular", "value": "1" },
-          { "label": "Large", "value": "2" }
-        ]
+          {
+            "label": "Small",
+            "value": "0"
+          },
+          {
+            "label": "Regular",
+            "value": "1"
+          },
+          {
+            "label": "Large",
+            "value": "2"
+          }
+        ],
+        "group": "bluetooth"
       },
       {
         "type": "text",
-        "defaultValue": "<p style='color:lightblue'>CONNECTED COLORS</p>"
+        "defaultValue": "<p style='color:lightblue'>CONNECTED COLORS</p>",
+        "group": "bluetooth"
       },
       {
         "type": "color",
         "sunlight": false,
         "messageKey": "btcolor",
         "defaultValue": "0x000000",
-        "label": "Sign Color"
+        "label": "Sign Color",
+        "group": "bluetooth"
       },
       {
         "type": "color",
         "sunlight": false,
         "messageKey": "btbackcolor",
         "defaultValue": "0xFFFFFF",
-        "label": "Background Color"
+        "label": "Background Color",
+        "group": "bluetooth"
       },
       {
         "type": "color",
         "sunlight": false,
         "messageKey": "btbordercolor",
         "defaultValue": "0x000000",
-        "label": "Rim Color"
+        "label": "Rim Color",
+        "group": "bluetooth"
       },
       {
         "type": "text",
-        "defaultValue": "<p style='color:lightblue'>DISCONNECTED COLORS</p>"
+        "defaultValue": "<p style='color:lightblue'>DISCONNECTED COLORS</p>",
+        "group": "bluetooth"
       },
       {
         "type": "color",
         "sunlight": false,
         "messageKey": "btoffcolor",
         "defaultValue": "0xFFFFFF",
-        "label": "Sign Color"
+        "label": "Sign Color",
+        "group": "bluetooth"
       },
       {
         "type": "color",
         "sunlight": false,
         "messageKey": "btoffbackcolor",
         "defaultValue": "0x000000",
-        "label": "Background Color"
+        "label": "Background Color",
+        "group": "bluetooth"
       },
       {
         "type": "color",
         "sunlight": false,
         "messageKey": "btoffbordercolor",
         "defaultValue": "0xFFFFFF",
-        "label": "Rim Color"
+        "label": "Rim Color",
+        "group": "bluetooth"
       }
     ]
   },
@@ -726,13 +982,15 @@
     "items": [
       {
         "type": "heading",
-        "defaultValue": "Battery Settings"
+        "defaultValue": "Battery Settings",
+        "id": "heading-battery"
       },
       {
         "type": "toggle",
         "messageKey": "battery",
         "defaultValue": false,
-        "label": "Enable Battery Display"
+        "label": "Enable Battery Display",
+        "group": "battery"
       },
       {
         "type": "slider",
@@ -741,7 +999,8 @@
         "label": "Low Battery Warning (Percent)",
         "min": 0,
         "max": 100,
-        "step": 10
+        "step": 10,
+        "group": "battery"
       },
       {
         "type": "radiogroup",
@@ -749,9 +1008,16 @@
         "label": "Shape",
         "defaultValue": "0",
         "options": [
-          { "label": "Round", "value": "0" },
-          { "label": "Square", "value": "1" }
-        ]
+          {
+            "label": "Round",
+            "value": "0"
+          },
+          {
+            "label": "Square",
+            "value": "1"
+          }
+        ],
+        "group": "battery"
       },
       {
         "type": "slider",
@@ -760,7 +1026,8 @@
         "label": "Position (degree)",
         "min": 0,
         "max": 360,
-        "step": 5
+        "step": 5,
+        "group": "battery"
       },
       {
         "type": "slider",
@@ -769,7 +1036,8 @@
         "label": "Position (0 = center, 100 = rim)",
         "min": 0,
         "max": 100,
-        "step": 1
+        "step": 1,
+        "group": "battery"
       },
       {
         "type": "radiogroup",
@@ -777,60 +1045,78 @@
         "label": "Size",
         "defaultValue": "1",
         "options": [
-          { "label": "Small", "value": "0" },
-          { "label": "Regular", "value": "1" },
-          { "label": "Large", "value": "2" }
-        ]
+          {
+            "label": "Small",
+            "value": "0"
+          },
+          {
+            "label": "Regular",
+            "value": "1"
+          },
+          {
+            "label": "Large",
+            "value": "2"
+          }
+        ],
+        "group": "battery"
       },
       {
         "type": "text",
-        "defaultValue": "<p style='color:lightblue'>BATTERY GOOD COLORS</p>"
+        "defaultValue": "<p style='color:lightblue'>BATTERY GOOD COLORS</p>",
+        "group": "battery"
       },
       {
         "type": "color",
         "sunlight": false,
         "messageKey": "battcolor",
         "defaultValue": "0xFFFFFF",
-        "label": "Text Color"
+        "label": "Text Color",
+        "group": "battery"
       },
       {
         "type": "color",
         "sunlight": false,
         "messageKey": "battbackcolor",
         "defaultValue": "0x000000",
-        "label": "Background Color"
+        "label": "Background Color",
+        "group": "battery"
       },
       {
         "type": "color",
         "sunlight": false,
         "messageKey": "battbordercolor",
         "defaultValue": "0xFFFFFF",
-        "label": "Rim Color"
+        "label": "Rim Color",
+        "group": "battery"
       },
       {
         "type": "text",
-        "defaultValue": "<p style='color:lightblue'>LOW BATT COLORS</p>"
+        "defaultValue": "<p style='color:lightblue'>LOW BATT COLORS</p>",
+        "group": "battery"
       },
       {
         "type": "color",
         "sunlight": false,
         "messageKey": "battwarncolor",
         "defaultValue": "0xFFFFFF",
-        "label": "Text Color"
+        "label": "Text Color",
+        "group": "battery"
       },
       {
         "type": "color",
         "sunlight": false,
         "messageKey": "battwarnbackcolor",
         "defaultValue": "0x000000",
-        "label": "Background Color"
+        "label": "Background Color",
+        "group": "battery"
       },
       {
         "type": "color",
         "sunlight": false,
         "messageKey": "battwarnbordercolor",
         "defaultValue": "0xFFFFFF",
-        "label": "Rim Color"
+        "label": "Rim Color",
+        "group": "battery"
       }
     ]
   },
@@ -839,32 +1125,122 @@
     "items": [
       {
         "type": "heading",
-        "defaultValue": "Appearance Style"
+        "defaultValue": "Appearance Style",
+        "id": "heading-appearance"
       },
       {
         "type": "toggle",
         "messageKey": "fullscreen",
         "defaultValue": true,
         "label": "Fullscreen",
-        "description": "Effect is restricted to rectangular devices."
+        "description": "Effect is restricted to rectangular devices.",
+        "group": "appearance"
       },
       {
         "type": "toggle",
         "messageKey": "showsecond",
         "defaultValue": false,
-        "label": "Show Seconds"
+        "label": "Show Seconds",
+        "group": "appearance"
       },
       {
         "type": "toggle",
         "messageKey": "showminsmark",
         "label": "Show Minute Marks",
-        "defaultValue": true
+        "defaultValue": true,
+        "group": "appearance"
       },
       {
         "type": "toggle",
         "messageKey": "showhourmark",
         "label": "Show Hour Marks",
-        "defaultValue": true
+        "defaultValue": true,
+        "group": "appearance"
+      }
+    ]
+  },
+  {
+    "type": "section",
+    "items": [
+      {
+        "type": "heading",
+        "defaultValue": "Moon Phase Settings",
+        "id": "heading-moon"
+      },
+      {
+        "type": "toggle",
+        "messageKey": "showmoonphase",
+        "label": "Show Moon Phase",
+        "defaultValue": false,
+        "group": "moon"
+      },
+      {
+        "type": "slider",
+        "messageKey": "moonposdegree",
+        "defaultValue": 45,
+        "label": "Position (degree)",
+        "min": 0,
+        "max": 360,
+        "step": 5,
+        "group": "moon"
+      },
+      {
+        "type": "slider",
+        "messageKey": "moonpositionrim",
+        "defaultValue": 50,
+        "label": "Position (0 = center, 100 = rim)",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "group": "moon"
+      },
+      {
+        "type": "slider",
+        "messageKey": "moonradius",
+        "defaultValue": 15,
+        "label": "Disc Size (radius)",
+        "min": 8,
+        "max": 30,
+        "step": 1,
+        "group": "moon"
+      },
+      {
+        "type": "color",
+        "sunlight": false,
+        "messageKey": "moonlightcolor",
+        "defaultValue": "0xFFFFFF",
+        "label": "Light Side Color",
+        "group": "moon"
+      },
+      {
+        "type": "color",
+        "sunlight": false,
+        "messageKey": "moondarkcolor",
+        "defaultValue": "0x000000",
+        "label": "Dark Side Color",
+        "group": "moon"
+      },
+      {
+        "type": "toggle",
+        "messageKey": "moonborder",
+        "label": "Show Border",
+        "defaultValue": true,
+        "group": "moon"
+      },
+      {
+        "type": "color",
+        "sunlight": false,
+        "messageKey": "moonbordercolor",
+        "defaultValue": "0x000000",
+        "label": "Border Color",
+        "group": "moon"
+      },
+      {
+        "type": "toggle",
+        "messageKey": "moonhemisphere",
+        "label": "Southern Hemisphere (mirror phase)",
+        "defaultValue": false,
+        "group": "moon"
       }
     ]
   },
