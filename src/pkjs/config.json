@@ -12,6 +12,129 @@
     "items": [
       {
         "type": "heading",
+        "defaultValue": "Presets",
+        "id": "heading-presets"
+      },
+      {
+        "type": "text",
+        "defaultValue": "Store up to 5 complete configurations. <em>Load</em> fills the page with the stored values; <em>Save to Slot</em> stores what the page currently shows. Both only become permanent when you press <em>Save Settings</em> at the bottom.",
+        "group": "presets"
+      },
+      {
+        "type": "select",
+        "id": "preset-slot",
+        "label": "Slot",
+        "defaultValue": "0",
+        "options": [
+          { "label": "1: —", "value": "0" },
+          { "label": "2: —", "value": "1" },
+          { "label": "3: —", "value": "2" },
+          { "label": "4: —", "value": "3" },
+          { "label": "5: —", "value": "4" }
+        ],
+        "group": "presets"
+      },
+      {
+        "type": "input",
+        "id": "preset-name",
+        "label": "Name",
+        "defaultValue": "",
+        "attributes": { "placeholder": "Preset name" },
+        "group": "presets"
+      },
+      {
+        "type": "button",
+        "id": "preset-save",
+        "defaultValue": "Save current settings to slot",
+        "group": "presets"
+      },
+      {
+        "type": "button",
+        "id": "preset-load",
+        "defaultValue": "Load slot into page",
+        "primary": true,
+        "group": "presets"
+      },
+      {
+        "type": "text",
+        "defaultValue": "<p style='color:lightblue'>PRESET CODE</p>",
+        "group": "presets"
+      },
+      {
+        "type": "text",
+        "defaultValue": "A code holds a complete configuration as text. Copy it somewhere safe and you can paste it back after a reinstall, on another phone, or send it to someone else. Codes only store what you changed, so a lightly tweaked setup gives a shorter code than a heavily rebuilt one.",
+        "group": "presets"
+      },
+      {
+        "type": "input",
+        "id": "preset-code",
+        "label": "Code",
+        "defaultValue": "",
+        "attributes": { "placeholder": "YS-XXXXX-XXXXX-..." },
+        "group": "presets"
+      },
+      {
+        "type": "button",
+        "id": "preset-code-gen",
+        "defaultValue": "Show code for current settings",
+        "group": "presets"
+      },
+      {
+        "type": "button",
+        "id": "preset-code-apply",
+        "defaultValue": "Apply code from the field",
+        "group": "presets"
+      },
+      {
+        "type": "input",
+        "id": "preset-blob",
+        "messageKey": "presetblob",
+        "label": "",
+        "defaultValue": "",
+        "group": "presets"
+      }
+    ]
+  },
+  {
+    "type": "section",
+    "items": [
+      {
+        "type": "heading",
+        "defaultValue": "Screen Adjustment",
+        "id": "heading-screen"
+      },
+      {
+        "type": "text",
+        "defaultValue": "If your display isn't perfectly centered, nudge everything up or down.",
+        "group": "screen"
+      },
+      {
+        "type": "slider",
+        "messageKey": "screenoffsety",
+        "defaultValue": 0,
+        "label": "Vertical Offset (pixels)",
+        "min": -5,
+        "max": 5,
+        "step": 1,
+        "group": "screen"
+      },
+      {
+        "type": "slider",
+        "messageKey": "screenoffsetx",
+        "defaultValue": 0,
+        "label": "Horizontal Offset (pixels)",
+        "min": -5,
+        "max": 5,
+        "step": 1,
+        "group": "screen"
+      }
+    ]
+  },
+  {
+    "type": "section",
+    "items": [
+      {
+        "type": "heading",
         "defaultValue": "Color Settings",
         "id": "heading-colors"
       },
@@ -123,6 +246,14 @@
         "group": "lengths"
       },
       {
+        "type": "toggle",
+        "messageKey": "discretehands",
+        "label": "Snap Hands to 6° Steps",
+        "defaultValue": false,
+        "description": "Makes the hour, minute and second hands jump in fixed 6-degree increments instead of moving smoothly, so hands can land exactly on top of each other at matching positions.",
+        "group": "lengths"
+      },
+      {
         "type": "text",
         "defaultValue": "<p style='color:lightblue'>HAND LENGTH</p>",
         "group": "lengths"
@@ -186,6 +317,46 @@
         "type": "slider",
         "messageKey": "secsbalancelength",
         "defaultValue": 20,
+        "label": "Seconds Hand",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "group": "lengths"
+      },
+      {
+        "type": "text",
+        "defaultValue": "<p style='color:lightblue'>NEEDLE START</p>",
+        "group": "lengths"
+      },
+      {
+        "type": "text",
+        "defaultValue": "Moves the inner end of the hand outward, away from the center, instead of starting at it. Combined with a short hand length, this turns the hand into a floating dot/dash, like a marker moving around a track.",
+        "group": "lengths"
+      },
+      {
+        "type": "slider",
+        "messageKey": "hourneedlestart",
+        "defaultValue": 0,
+        "label": "Hour Hand",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "group": "lengths"
+      },
+      {
+        "type": "slider",
+        "messageKey": "minsneedlestart",
+        "defaultValue": 0,
+        "label": "Minute Hand",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "group": "lengths"
+      },
+      {
+        "type": "slider",
+        "messageKey": "secsneedlestart",
+        "defaultValue": 0,
         "label": "Seconds Hand",
         "min": 0,
         "max": 100,
@@ -736,6 +907,59 @@
     "items": [
       {
         "type": "heading",
+        "defaultValue": "Center Hub & Axis",
+        "id": "heading-center"
+      },
+      {
+        "type": "text",
+        "defaultValue": "The hub is the colored circle where the hands meet; the axis is the small dot on top of it. Both appear only while at least one hand starts at the center.",
+        "group": "center"
+      },
+      {
+        "type": "toggle",
+        "messageKey": "showcenterhub",
+        "label": "Show Hub",
+        "defaultValue": true,
+        "group": "center"
+      },
+      {
+        "type": "toggle",
+        "messageKey": "centerhubauto",
+        "label": "Hub Uses Hand Colors",
+        "defaultValue": true,
+        "description": "On: each hand draws its hub circle in its own color (classic look). Off: the custom color below is used.",
+        "group": "center"
+      },
+      {
+        "type": "color",
+        "sunlight": false,
+        "messageKey": "centerhubcolor",
+        "defaultValue": "0x000000",
+        "label": "Custom Hub Color",
+        "group": "center"
+      },
+      {
+        "type": "toggle",
+        "messageKey": "showcenteraxis",
+        "label": "Show Axis Dot",
+        "defaultValue": true,
+        "group": "center"
+      },
+      {
+        "type": "color",
+        "sunlight": false,
+        "messageKey": "centeraxiscolor",
+        "defaultValue": "0x555555",
+        "label": "Axis Dot Color",
+        "group": "center"
+      }
+    ]
+  },
+  {
+    "type": "section",
+    "items": [
+      {
+        "type": "heading",
         "defaultValue": "Date Settings",
         "id": "heading-date"
       },
@@ -1198,9 +1422,10 @@
         "type": "slider",
         "messageKey": "moonradius",
         "defaultValue": 15,
-        "label": "Disc Size (radius)",
+        "label": "Disc Size (radius in pixels)",
+        "description": "Up to 130, which fills the whole display on a Pebble Round 2. Anything larger than half the display width simply extends past the edge.",
         "min": 8,
-        "max": 30,
+        "max": 130,
         "step": 1,
         "group": "moon"
       },
@@ -1241,6 +1466,305 @@
         "label": "Southern Hemisphere (mirror phase)",
         "defaultValue": false,
         "group": "moon"
+      }
+    ]
+  },
+  {
+    "type": "section",
+    "items": [
+      {
+        "type": "heading",
+        "defaultValue": "Steps Settings",
+        "id": "heading-steps"
+      },
+      {
+        "type": "toggle",
+        "messageKey": "showsteps",
+        "label": "Show Steps",
+        "defaultValue": false,
+        "group": "steps"
+      },
+      {
+        "type": "radiogroup",
+        "messageKey": "stepsstyle",
+        "label": "Style",
+        "defaultValue": "0",
+        "options": [
+          { "label": "Text (STEPS + count)", "value": "0" },
+          { "label": "Sub-Dial with needle", "value": "1" }
+        ],
+        "group": "steps"
+      },
+      {
+        "type": "radiogroup",
+        "messageKey": "stepsontop",
+        "label": "Layer",
+        "defaultValue": "0",
+        "options": [
+          { "label": "Above marks, below hands", "value": "0" },
+          { "label": "Above everything", "value": "1" },
+          { "label": "Behind the hour/minute marks", "value": "2" }
+        ],
+        "group": "steps"
+      },
+      {
+        "type": "slider",
+        "messageKey": "stepsposdegree",
+        "defaultValue": 135,
+        "label": "Position (degree)",
+        "min": 0,
+        "max": 360,
+        "step": 5,
+        "group": "steps"
+      },
+      {
+        "type": "slider",
+        "messageKey": "stepspositionrim",
+        "defaultValue": 50,
+        "label": "Position (0 = center, 100 = rim)",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "group": "steps"
+      },
+      {
+        "type": "text",
+        "defaultValue": "<p style='color:lightblue'>TEXT STYLE</p>",
+        "group": "steps"
+      },
+      {
+        "type": "radiogroup",
+        "messageKey": "stepssize",
+        "label": "Size",
+        "defaultValue": "1",
+        "options": [
+          { "label": "Small", "value": "0" },
+          { "label": "Medium", "value": "1" },
+          { "label": "Large", "value": "2" }
+        ],
+        "group": "steps"
+      },
+      {
+        "type": "radiogroup",
+        "messageKey": "stepsshape",
+        "label": "Shape",
+        "defaultValue": "0",
+        "options": [
+          { "label": "Round", "value": "0" },
+          { "label": "Square", "value": "1" }
+        ],
+        "group": "steps"
+      },
+      {
+        "type": "color",
+        "sunlight": false,
+        "messageKey": "stepslabelcolor",
+        "defaultValue": "0x000000",
+        "label": "\"STEPS\" Label Color",
+        "group": "steps"
+      },
+      {
+        "type": "color",
+        "sunlight": false,
+        "messageKey": "stepsvaluecolor",
+        "defaultValue": "0x000000",
+        "label": "Step Count Color",
+        "group": "steps"
+      },
+      {
+        "type": "color",
+        "sunlight": false,
+        "messageKey": "stepstextbackcolor",
+        "defaultValue": "0xFFFFFF",
+        "label": "Background Color",
+        "group": "steps"
+      },
+      {
+        "type": "color",
+        "sunlight": false,
+        "messageKey": "stepstextbordercolor",
+        "defaultValue": "0x000000",
+        "label": "Border Color",
+        "group": "steps"
+      },
+      {
+        "type": "text",
+        "defaultValue": "<p style='color:lightblue'>SUB-DIAL STYLE</p>",
+        "group": "steps"
+      },
+      {
+        "type": "slider",
+        "messageKey": "stepsdialradius",
+        "defaultValue": 35,
+        "label": "Dial Radius (% of screen, up to full size)",
+        "min": 10,
+        "max": 100,
+        "step": 1,
+        "group": "steps"
+      },
+      {
+        "type": "slider",
+        "messageKey": "stepsneedlelength",
+        "defaultValue": 70,
+        "label": "Needle Length (% of dial radius)",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "group": "steps"
+      },
+      {
+        "type": "slider",
+        "messageKey": "stepsneedlebalancelength",
+        "defaultValue": 0,
+        "label": "Needle Tail Length (% of dial radius)",
+        "min": 0,
+        "max": 50,
+        "step": 1,
+        "group": "steps"
+      },
+      {
+        "type": "slider",
+        "messageKey": "stepsneedlestart",
+        "defaultValue": 0,
+        "label": "Needle Start (% of dial radius, 0 = from center)",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "group": "steps"
+      },
+      {
+        "type": "slider",
+        "messageKey": "stepsneedlethickness",
+        "defaultValue": 5,
+        "label": "Needle Thickness",
+        "min": 1,
+        "max": 11,
+        "step": 2,
+        "group": "steps"
+      },
+      {
+        "type": "color",
+        "sunlight": false,
+        "messageKey": "stepsneedlecolor",
+        "defaultValue": "0x000000",
+        "label": "Needle Color",
+        "group": "steps"
+      },
+      {
+        "type": "toggle",
+        "messageKey": "stepssegment",
+        "label": "Show Progress Segment",
+        "defaultValue": false,
+        "description": "Fills the area from 12 o'clock to the current value in needle color, between the Needle Start and Needle Length radii.",
+        "group": "steps"
+      },
+      {
+        "type": "slider",
+        "messageKey": "stepsfillinnerpos",
+        "defaultValue": 50,
+        "label": "Needle Fill Inner Position (%)",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "group": "steps"
+      },
+      {
+        "type": "slider",
+        "messageKey": "stepsfillouterpos",
+        "defaultValue": 62,
+        "label": "Needle Fill Outer Position (%)",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "group": "steps"
+      },
+      {
+        "type": "slider",
+        "messageKey": "stepsfillthickness",
+        "defaultValue": 3,
+        "label": "Needle Fill Thickness",
+        "min": 1,
+        "max": 11,
+        "step": 2,
+        "group": "steps"
+      },
+      {
+        "type": "color",
+        "sunlight": false,
+        "messageKey": "stepsfillcolor",
+        "defaultValue": "0x000000",
+        "label": "Needle Fill Color",
+        "group": "steps"
+      },
+      {
+        "type": "toggle",
+        "messageKey": "stepsdialborder",
+        "label": "Show Dial Border",
+        "defaultValue": true,
+        "group": "steps"
+      },
+      {
+        "type": "radiogroup",
+        "messageKey": "stepsdialborderthickness",
+        "label": "Border Thickness",
+        "defaultValue": "2",
+        "options": [
+          { "label": "Thin", "value": "1" },
+          { "label": "Mid", "value": "2" },
+          { "label": "Thick", "value": "3" }
+        ],
+        "group": "steps"
+      },
+      {
+        "type": "color",
+        "sunlight": false,
+        "messageKey": "stepsdialbordercolor",
+        "defaultValue": "0x000000",
+        "label": "Dial Border Color",
+        "group": "steps"
+      },
+      {
+        "type": "color",
+        "sunlight": false,
+        "messageKey": "stepsmarkcolor",
+        "defaultValue": "0x000000",
+        "label": "Dial Mark Color",
+        "group": "steps"
+      },
+      {
+        "type": "slider",
+        "messageKey": "stepsmarkthickness",
+        "defaultValue": 3,
+        "label": "Dial Mark Thickness",
+        "min": 1,
+        "max": 11,
+        "step": 2,
+        "group": "steps"
+      },
+      {
+        "type": "slider",
+        "messageKey": "stepsmarkinnerpos",
+        "defaultValue": 80,
+        "label": "Dial Mark Inner Position (%)",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "group": "steps"
+      },
+      {
+        "type": "slider",
+        "messageKey": "stepsmarkouterpos",
+        "defaultValue": 100,
+        "label": "Dial Mark Outer Position (%)",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "group": "steps"
+      },
+      {
+        "type": "text",
+        "defaultValue": "<p>A full turn of the dial = 12000 steps (12 marks, 1000 steps apart).</p>",
+        "group": "steps"
       }
     ]
   },

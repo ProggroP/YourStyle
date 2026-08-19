@@ -98,6 +98,49 @@ typedef struct ClaySettings {
   int moonborder;
   GColor moonbordercolor;
   int moonhemisphere;
+  int showsteps;
+  int stepsstyle;
+  int stepsposdegree;
+  int stepspositionrim;
+  int stepssize;
+  int stepsshape;
+  GColor stepslabelcolor;
+  GColor stepsvaluecolor;
+  GColor stepstextbackcolor;
+  GColor stepstextbordercolor;
+  int stepsdialradius;
+  int stepsneedlelength;
+  int stepsneedlebalancelength;
+  int stepsneedlethickness;
+  GColor stepsneedlecolor;
+  GColor stepsfillcolor;
+  int stepsfillthickness;
+  int stepsfillinnerpos;
+  int stepsfillouterpos;
+  int stepsdialborder;
+  int stepsdialborderthickness;
+  GColor stepsdialbordercolor;
+  GColor stepsmarkcolor;
+  int stepsmarkthickness;
+  int stepsmarkinnerpos;
+  int stepsmarkouterpos;
+  int screenoffsety;
+  int screenoffsetx;
+  // Settings are persisted as a raw byte dump of this struct, so field order
+  // is part of the storage format: only append here, never insert above, or
+  // every already-saved configuration is read back shifted.
+  int hourneedlestart;
+  int minsneedlestart;
+  int secsneedlestart;
+  int discretehands;
+  int stepsontop;
+  int stepsneedlestart;
+  int stepssegment;
+  int showcenterhub;
+  int centerhubauto;
+  int showcenteraxis;
+  GColor centerhubcolor;
+  GColor centeraxiscolor;
 } ClaySettings;
 
 // An instance of the struct
@@ -109,8 +152,40 @@ static ClaySettings settings;
 
 // Pebble's persist_write_data/persist_read_data allow at most 256 bytes per
 // key (PERSIST_DATA_MAX_LENGTH). The settings struct has grown past that,
-// so it is split into two halves stored under separate keys.
-#define SETTINGS_SPLIT (sizeof(ClaySettings) / 2)
+// so it is split into two chunks stored under separate keys.
+//
+// This offset is a fixed part of the storage format, not sizeof/2: deriving
+// it from the struct size would move the boundary whenever a field is added,
+// and every already-saved second chunk would be read back at the wrong offset.
+#define SETTINGS_SPLIT 196
+
+_Static_assert(SETTINGS_SPLIT <= PERSIST_DATA_MAX_LENGTH, "first settings chunk exceeds persist limit");
+_Static_assert(sizeof(ClaySettings) - SETTINGS_SPLIT <= PERSIST_DATA_MAX_LENGTH, "second settings chunk exceeds persist limit");
+
+// Clay delivers every setting in a single dictionary. With ~130 keys that is
+// roughly 1.4 kB, and an inbox even slightly too small makes the firmware drop
+// the whole message -- no setting arrives at all, rather than just the last few.
+// The watchface never sends anything back, so the outbox only needs to be
+// non-zero.
+//
+// The inbox is requested from the app heap, and aplite only has 24 kB of RAM
+// in total: there the roomy buffer fails outright with APP_MSG_OUT_OF_MEMORY
+// and no setting would ever arrive. So try progressively smaller buffers and
+// keep the largest one the platform actually grants. The smallest entry must
+// stay above the real dictionary size (see APP_MSG_DICT_BYTES) or settings
+// break silently on that platform.
+#define APP_MSG_OUTBOX_SIZE 64
+#define APP_MSG_DICT_BYTES  1400
+
+static const uint16_t APP_MSG_INBOX_SIZES[] = { 2048, 1792, 1600, 1472 };
+
+// The moon's lit half and its terminator are filled polygons approximating a
+// circle. The segment counts are sized for the largest moon the config allows
+// (radius 130, a full-screen moon on gabbro): at 130 px both keep the polygon
+// within ~0.3 px of a true circle, so the edge still reads as round.
+#define MOON_HALF_SEGMENTS    24
+#define MOON_ELLIPSE_SEGMENTS 48
+#define MOON_RADIUS_MAX      130
 
 // Initialize the default settings
 static void default_settings() {
@@ -121,6 +196,7 @@ static void default_settings() {
   settings.minsmarkcolor = GColorBlack;
   settings.hourmarkcolor = GColorBlack;
   settings.fullscreen    = 1;
+  settings.discretehands = 0;
   settings.showsecond    = 0;
   settings.showminsmark  = 1;
   settings.showhourmark  = 1;
@@ -130,6 +206,9 @@ static void default_settings() {
   settings.hourbalancelength = 0;
   settings.minsbalancelength = 0;
   settings.secsbalancelength = 20;
+  settings.hourneedlestart = 0;
+  settings.minsneedlestart = 0;
+  settings.secsneedlestart = 0;
   settings.hourthickness = 9;
   settings.minsthickness = 7;
   settings.secsthickness = 5;
@@ -206,6 +285,42 @@ static void default_settings() {
   settings.moonborder        = 1;
   settings.moonbordercolor   = GColorBlack;
   settings.moonhemisphere    = 0;
+  settings.showsteps              = 0;
+  settings.stepsstyle             = 0;
+  settings.stepsontop             = 0;
+  settings.stepsposdegree         = 135;
+  settings.stepspositionrim       = 50;
+  settings.stepssize              = 1;
+  settings.stepsshape             = 0;
+  settings.stepslabelcolor        = GColorBlack;
+  settings.stepsvaluecolor        = GColorBlack;
+  settings.stepstextbackcolor     = GColorWhite;
+  settings.stepstextbordercolor   = GColorBlack;
+  settings.stepsdialradius        = 35;
+  settings.stepsneedlelength      = 70;
+  settings.stepsneedlebalancelength = 0;
+  settings.stepsneedlestart       = 0;
+  settings.stepsneedlethickness   = 5;
+  settings.stepsneedlecolor       = GColorBlack;
+  settings.stepsfillcolor         = GColorBlack;
+  settings.stepsfillthickness     = 3;
+  settings.stepsfillinnerpos      = 50;
+  settings.stepsfillouterpos      = 62;
+  settings.stepsdialborder        = 1;
+  settings.stepsdialborderthickness = 2;
+  settings.stepsdialbordercolor   = GColorBlack;
+  settings.stepsmarkcolor         = GColorBlack;
+  settings.stepsmarkthickness     = 3;
+  settings.stepsmarkinnerpos      = 80;
+  settings.stepsmarkouterpos      = 100;
+  settings.screenoffsety          = 0;
+  settings.screenoffsetx          = 0;
+  settings.stepssegment           = 0;
+  settings.showcenterhub          = 1;
+  settings.centerhubauto          = 1;
+  settings.showcenteraxis         = 1;
+  settings.centerhubcolor         = GColorBlack;
+  settings.centeraxiscolor        = GColorDarkGray;
 }
 
 // Read settings from persistent storage
@@ -277,10 +392,16 @@ static void in_received_handler(DictionaryIterator *iter, void *context) {
   
   // read fullscreen setting
   Tuple *fullscreen_conf = dict_find(iter, MESSAGE_KEY_fullscreen);
-  if( fullscreen_conf ) { 
+  if( fullscreen_conf ) {
     settings.fullscreen = fullscreen_conf->value->int32;
   }
-    
+
+  // read discrete (6-degree stepped) hands setting
+  Tuple *discretehands_conf = dict_find(iter, MESSAGE_KEY_discretehands);
+  if( discretehands_conf ) {
+    settings.discretehands = discretehands_conf->value->int32;
+  }
+
   // read show minute mark setting
   Tuple *showminsmark_conf = dict_find(iter, MESSAGE_KEY_showminsmark);
   if( showminsmark_conf ) { 
@@ -325,9 +446,27 @@ static void in_received_handler(DictionaryIterator *iter, void *context) {
 
   // read mins length setting
   Tuple *secsbalancelength_conf = dict_find(iter, MESSAGE_KEY_secsbalancelength);
-  if( secsbalancelength_conf ) { 
+  if( secsbalancelength_conf ) {
     settings.secsbalancelength = secsbalancelength_conf->value->int32;
-  } 
+  }
+
+  // read hour needle start setting (floating needle, e.g. a dot indicator)
+  Tuple *hourneedlestart_conf = dict_find(iter, MESSAGE_KEY_hourneedlestart);
+  if( hourneedlestart_conf ) {
+    settings.hourneedlestart = hourneedlestart_conf->value->int32;
+  }
+
+  // read minute needle start setting
+  Tuple *minsneedlestart_conf = dict_find(iter, MESSAGE_KEY_minsneedlestart);
+  if( minsneedlestart_conf ) {
+    settings.minsneedlestart = minsneedlestart_conf->value->int32;
+  }
+
+  // read seconds needle start setting
+  Tuple *secsneedlestart_conf = dict_find(iter, MESSAGE_KEY_secsneedlestart);
+  if( secsneedlestart_conf ) {
+    settings.secsneedlestart = secsneedlestart_conf->value->int32;
+  }
 
   // read hour hand thickness setting
   Tuple *hourthickness_conf = dict_find(iter, MESSAGE_KEY_hourthickness);
@@ -396,7 +535,11 @@ static void in_received_handler(DictionaryIterator *iter, void *context) {
   Tuple *moonradius_conf = dict_find(iter, MESSAGE_KEY_moonradius);
   if( moonradius_conf ) {
     settings.moonradius = moonradius_conf->value->int32;
-  } 
+    // guard the fixed-size polygon buffers' accuracy assumption
+    if( settings.moonradius > MOON_RADIUS_MAX ) {
+      settings.moonradius = MOON_RADIUS_MAX;
+    }
+  }
 
   Tuple *moonlightcolor_conf = dict_find(iter, MESSAGE_KEY_moonlightcolor);
   if( moonlightcolor_conf ) {
@@ -421,6 +564,200 @@ static void in_received_handler(DictionaryIterator *iter, void *context) {
   Tuple *moonhemisphere_conf = dict_find(iter, MESSAGE_KEY_moonhemisphere);
   if( moonhemisphere_conf ) {
     settings.moonhemisphere = moonhemisphere_conf->value->int32;
+  } 
+
+  // read steps settings
+  Tuple *showsteps_conf = dict_find(iter, MESSAGE_KEY_showsteps);
+  if( showsteps_conf ) {
+    settings.showsteps = showsteps_conf->value->int32;
+  } 
+
+  char stepsbuf[8];
+  Tuple *stepsstyle_conf = dict_find(iter, MESSAGE_KEY_stepsstyle);
+  if( stepsstyle_conf ) {
+    strcpy( stepsbuf, stepsstyle_conf->value->cstring);
+    settings.stepsstyle = atoi(stepsbuf);
+  }
+
+  // read which layer the steps display sits on:
+  // 0 = above the marks but below the hands, 1 = above everything,
+  // 2 = underneath the hour/minute marks
+  Tuple *stepsontop_conf = dict_find(iter, MESSAGE_KEY_stepsontop);
+  if( stepsontop_conf ) {
+    strcpy( stepsbuf, stepsontop_conf->value->cstring);
+    settings.stepsontop = atoi(stepsbuf);
+  }
+
+  Tuple *stepsposdegree_conf = dict_find(iter, MESSAGE_KEY_stepsposdegree);
+  if( stepsposdegree_conf ) {
+    settings.stepsposdegree = stepsposdegree_conf->value->int32;
+  } 
+
+  Tuple *stepspositionrim_conf = dict_find(iter, MESSAGE_KEY_stepspositionrim);
+  if( stepspositionrim_conf ) {
+    settings.stepspositionrim = stepspositionrim_conf->value->int32;
+  } 
+
+  Tuple *stepssize_conf = dict_find(iter, MESSAGE_KEY_stepssize);
+  if( stepssize_conf ) {
+    strcpy( stepsbuf, stepssize_conf->value->cstring);
+    settings.stepssize = atoi(stepsbuf);
+  } 
+
+  Tuple *stepsshape_conf = dict_find(iter, MESSAGE_KEY_stepsshape);
+  if( stepsshape_conf ) {
+    strcpy( stepsbuf, stepsshape_conf->value->cstring);
+    settings.stepsshape = atoi(stepsbuf);
+  } 
+
+  Tuple *stepslabelcolor_conf = dict_find(iter, MESSAGE_KEY_stepslabelcolor);
+  if( stepslabelcolor_conf ) {
+    settings.stepslabelcolor = GColorFromHEX(stepslabelcolor_conf->value->int32);
+  } 
+
+  Tuple *stepsvaluecolor_conf = dict_find(iter, MESSAGE_KEY_stepsvaluecolor);
+  if( stepsvaluecolor_conf ) {
+    settings.stepsvaluecolor = GColorFromHEX(stepsvaluecolor_conf->value->int32);
+  } 
+
+  Tuple *stepstextbackcolor_conf = dict_find(iter, MESSAGE_KEY_stepstextbackcolor);
+  if( stepstextbackcolor_conf ) {
+    settings.stepstextbackcolor = GColorFromHEX(stepstextbackcolor_conf->value->int32);
+  } 
+
+  Tuple *stepstextbordercolor_conf = dict_find(iter, MESSAGE_KEY_stepstextbordercolor);
+  if( stepstextbordercolor_conf ) {
+    settings.stepstextbordercolor = GColorFromHEX(stepstextbordercolor_conf->value->int32);
+  } 
+
+  Tuple *stepsdialradius_conf = dict_find(iter, MESSAGE_KEY_stepsdialradius);
+  if( stepsdialradius_conf ) {
+    settings.stepsdialradius = stepsdialradius_conf->value->int32;
+  } 
+
+  Tuple *stepsneedlelength_conf = dict_find(iter, MESSAGE_KEY_stepsneedlelength);
+  if( stepsneedlelength_conf ) {
+    settings.stepsneedlelength = stepsneedlelength_conf->value->int32;
+  } 
+
+  Tuple *stepsneedlebalancelength_conf = dict_find(iter, MESSAGE_KEY_stepsneedlebalancelength);
+  if( stepsneedlebalancelength_conf ) {
+    settings.stepsneedlebalancelength = stepsneedlebalancelength_conf->value->int32;
+  }
+
+  // read steps needle start setting (floating needle, e.g. a dot indicator)
+  Tuple *stepsneedlestart_conf = dict_find(iter, MESSAGE_KEY_stepsneedlestart);
+  if( stepsneedlestart_conf ) {
+    settings.stepsneedlestart = stepsneedlestart_conf->value->int32;
+  }
+
+  // read steps progress segment setting (filled arc from 12 o'clock to value)
+  Tuple *stepssegment_conf = dict_find(iter, MESSAGE_KEY_stepssegment);
+  if( stepssegment_conf ) {
+    settings.stepssegment = stepssegment_conf->value->int32;
+  }
+
+  // CENTER HUB & AXIS SETTINGS
+
+  Tuple *showcenterhub_conf = dict_find(iter, MESSAGE_KEY_showcenterhub);
+  if( showcenterhub_conf ) {
+    settings.showcenterhub = showcenterhub_conf->value->int32;
+  }
+
+  Tuple *centerhubauto_conf = dict_find(iter, MESSAGE_KEY_centerhubauto);
+  if( centerhubauto_conf ) {
+    settings.centerhubauto = centerhubauto_conf->value->int32;
+  }
+
+  Tuple *centerhubcolor_conf = dict_find(iter, MESSAGE_KEY_centerhubcolor);
+  if( centerhubcolor_conf ) {
+    settings.centerhubcolor = GColorFromHEX(centerhubcolor_conf->value->int32);
+  }
+
+  Tuple *showcenteraxis_conf = dict_find(iter, MESSAGE_KEY_showcenteraxis);
+  if( showcenteraxis_conf ) {
+    settings.showcenteraxis = showcenteraxis_conf->value->int32;
+  }
+
+  Tuple *centeraxiscolor_conf = dict_find(iter, MESSAGE_KEY_centeraxiscolor);
+  if( centeraxiscolor_conf ) {
+    settings.centeraxiscolor = GColorFromHEX(centeraxiscolor_conf->value->int32);
+  }
+
+  Tuple *stepsneedlethickness_conf = dict_find(iter, MESSAGE_KEY_stepsneedlethickness);
+  if( stepsneedlethickness_conf ) {
+    settings.stepsneedlethickness = stepsneedlethickness_conf->value->int32;
+  } 
+
+  Tuple *stepsneedlecolor_conf = dict_find(iter, MESSAGE_KEY_stepsneedlecolor);
+  if( stepsneedlecolor_conf ) {
+    settings.stepsneedlecolor = GColorFromHEX(stepsneedlecolor_conf->value->int32);
+  } 
+
+  Tuple *stepsfillcolor_conf = dict_find(iter, MESSAGE_KEY_stepsfillcolor);
+  if( stepsfillcolor_conf ) {
+    settings.stepsfillcolor = GColorFromHEX(stepsfillcolor_conf->value->int32);
+  } 
+
+  Tuple *stepsfillthickness_conf = dict_find(iter, MESSAGE_KEY_stepsfillthickness);
+  if( stepsfillthickness_conf ) {
+    settings.stepsfillthickness = stepsfillthickness_conf->value->int32;
+  } 
+
+  Tuple *stepsfillinnerpos_conf = dict_find(iter, MESSAGE_KEY_stepsfillinnerpos);
+  if( stepsfillinnerpos_conf ) {
+    settings.stepsfillinnerpos = stepsfillinnerpos_conf->value->int32;
+  } 
+
+  Tuple *stepsfillouterpos_conf = dict_find(iter, MESSAGE_KEY_stepsfillouterpos);
+  if( stepsfillouterpos_conf ) {
+    settings.stepsfillouterpos = stepsfillouterpos_conf->value->int32;
+  } 
+
+  Tuple *stepsdialborder_conf = dict_find(iter, MESSAGE_KEY_stepsdialborder);
+  if( stepsdialborder_conf ) {
+    settings.stepsdialborder = stepsdialborder_conf->value->int32;
+  } 
+
+  Tuple *stepsdialborderthickness_conf = dict_find(iter, MESSAGE_KEY_stepsdialborderthickness);
+  if( stepsdialborderthickness_conf ) {
+    strcpy( stepsbuf, stepsdialborderthickness_conf->value->cstring);
+    settings.stepsdialborderthickness = atoi(stepsbuf);
+  } 
+
+  Tuple *stepsdialbordercolor_conf = dict_find(iter, MESSAGE_KEY_stepsdialbordercolor);
+  if( stepsdialbordercolor_conf ) {
+    settings.stepsdialbordercolor = GColorFromHEX(stepsdialbordercolor_conf->value->int32);
+  } 
+
+  Tuple *stepsmarkcolor_conf = dict_find(iter, MESSAGE_KEY_stepsmarkcolor);
+  if( stepsmarkcolor_conf ) {
+    settings.stepsmarkcolor = GColorFromHEX(stepsmarkcolor_conf->value->int32);
+  } 
+
+  Tuple *stepsmarkthickness_conf = dict_find(iter, MESSAGE_KEY_stepsmarkthickness);
+  if( stepsmarkthickness_conf ) {
+    settings.stepsmarkthickness = stepsmarkthickness_conf->value->int32;
+  } 
+
+  Tuple *stepsmarkinnerpos_conf = dict_find(iter, MESSAGE_KEY_stepsmarkinnerpos);
+  if( stepsmarkinnerpos_conf ) {
+    settings.stepsmarkinnerpos = stepsmarkinnerpos_conf->value->int32;
+  } 
+
+  Tuple *stepsmarkouterpos_conf = dict_find(iter, MESSAGE_KEY_stepsmarkouterpos);
+  if( stepsmarkouterpos_conf ) {
+    settings.stepsmarkouterpos = stepsmarkouterpos_conf->value->int32;
+  } 
+
+  Tuple *screenoffsety_conf = dict_find(iter, MESSAGE_KEY_screenoffsety);
+  if( screenoffsety_conf ) {
+    settings.screenoffsety = screenoffsety_conf->value->int32;
+  } 
+
+  Tuple *screenoffsetx_conf = dict_find(iter, MESSAGE_KEY_screenoffsetx);
+  if( screenoffsetx_conf ) {
+    settings.screenoffsetx = screenoffsetx_conf->value->int32;
   } 
   
   // read minute mark inner position setting
@@ -819,6 +1156,8 @@ static void in_received_handler(DictionaryIterator *iter, void *context) {
 }
 
 
+static void draw_steps(GContext *ctx, GPoint center, GRect bounds);
+
 static void hands_update_proc(Layer *layer, GContext *ctx) {
 
   time_t now = time(NULL);
@@ -828,14 +1167,27 @@ static void hands_update_proc(Layer *layer, GContext *ctx) {
   int min = t->tm_min;
   int sec = t->tm_sec;
   int day = t->tm_mday;
-  
+
+  // hand angles in whole degrees; optionally snapped to a 6-degree grid so
+  // hands can land exactly on top of each other (60 discrete positions,
+  // like a classic jumping minute hand). Minute and second already fall on
+  // that grid (min*6 / sec*6); only the hour hand needs the rounding.
+  int hourdeg = (hour*30)+(min*5/10);
+  int mindeg  = min*6;
+  int secdeg  = sec*6;
+  if( settings.discretehands == 1 ) {
+    hourdeg = (hourdeg/6)*6;
+    mindeg  = (mindeg/6)*6;
+    secdeg  = (secdeg/6)*6;
+  }
+
   int angle = 0;
- 
+
   GPoint inner, outer;
   int inner_pos, outer_pos;
   GRect bounds  = layer_get_bounds(s_hands_layer);
-  GPoint center = GPoint( bounds.size.w/2, bounds.size.h/2);
-    
+  GPoint center = GPoint( bounds.size.w/2 + settings.screenoffsetx, bounds.size.h/2 + settings.screenoffsety);
+
   graphics_context_set_antialiased(ctx, true);
 
   // date display
@@ -1103,9 +1455,13 @@ static void hands_update_proc(Layer *layer, GContext *ctx) {
  
   
   // hour hand
-  if( settings.hourlength > 0 || settings.hourbalancelength > 0 ) {
-    angle = DEG_TO_TRIGANGLE((hour*30)+(min*5/10));
-    inner_pos = -1*(bounds.size.w*settings.hourbalancelength/200);
+  bool hour_touches_center = false;
+  if( settings.hourlength > 0 || settings.hourbalancelength > 0 || settings.hourneedlestart > 0 ) {
+    angle = DEG_TO_TRIGANGLE(hourdeg);
+    // needlestart moves the inner end out along the pointing direction (a
+    // floating needle, e.g. a dot); balancelength extends it the opposite
+    // way through the center (a counterweight). They share the same point.
+    inner_pos = bounds.size.w*(settings.hourneedlestart - settings.hourbalancelength)/200;
     outer_pos = bounds.size.w*settings.hourlength/200;
     graphics_context_set_stroke_width(ctx, settings.hourthickness);
     graphics_context_set_stroke_color(ctx, settings.hourdialcolor );
@@ -1116,12 +1472,18 @@ static void hands_update_proc(Layer *layer, GContext *ctx) {
     outer.x = (int16_t)(sin_lookup(angle) * (int32_t)outer_pos / TRIG_MAX_RATIO) + center.x;
     // draw hour hand
     graphics_draw_line(ctx, inner, outer);
-    graphics_fill_circle(ctx, center, settings.hourthickness-1);
+    if( inner_pos <= 0 ) {
+      hour_touches_center = true;
+      if( settings.showcenterhub == 1 ) {
+        graphics_context_set_fill_color(ctx, settings.centerhubauto == 1 ? settings.hourdialcolor : settings.centerhubcolor);
+        graphics_fill_circle(ctx, center, settings.hourthickness-1);
+      }
+    }
   }
- 
+
   // hour hand filling
   if( settings.hourfillinnerpos > 0 || settings.hourfillouterpos > 0 ) {
-    angle = DEG_TO_TRIGANGLE((hour*30)+(min*5/10));
+    angle = DEG_TO_TRIGANGLE(hourdeg);
     inner_pos = bounds.size.w*settings.hourfillinnerpos/200;
     outer_pos = bounds.size.w*settings.hourfillouterpos/200;
     graphics_context_set_stroke_width(ctx, settings.hourfillthickness);
@@ -1136,9 +1498,10 @@ static void hands_update_proc(Layer *layer, GContext *ctx) {
   }
   
   // minute hand
-  if( settings.minslength > 0 || settings.minsbalancelength > 0 ) {
-    angle = DEG_TO_TRIGANGLE(min*6);
-    inner_pos = -1*(bounds.size.w*settings.minsbalancelength/200);
+  bool mins_touches_center = false;
+  if( settings.minslength > 0 || settings.minsbalancelength > 0 || settings.minsneedlestart > 0 ) {
+    angle = DEG_TO_TRIGANGLE(mindeg);
+    inner_pos = bounds.size.w*(settings.minsneedlestart - settings.minsbalancelength)/200;
     outer_pos = bounds.size.w*settings.minslength/200;
     graphics_context_set_stroke_width(ctx, settings.minsthickness);
     graphics_context_set_stroke_color(ctx, settings.minsdialcolor);
@@ -1149,13 +1512,18 @@ static void hands_update_proc(Layer *layer, GContext *ctx) {
     outer.x = (int16_t)(sin_lookup(angle) * (int32_t)outer_pos / TRIG_MAX_RATIO) + center.x;
     // draw minute hand
     graphics_draw_line(ctx, inner, outer);
-    // draw circle 
-    graphics_fill_circle(ctx, center, settings.minsthickness-1);
+    if( inner_pos <= 0 ) {
+      mins_touches_center = true;
+      if( settings.showcenterhub == 1 ) {
+        graphics_context_set_fill_color(ctx, settings.centerhubauto == 1 ? settings.minsdialcolor : settings.centerhubcolor);
+        graphics_fill_circle(ctx, center, settings.minsthickness-1);
+      }
+    }
   }
-  
+
   // minute hand filling
   if( settings.minsfillinnerpos > 0 || settings.minsfillouterpos > 0 ) {
-    angle = DEG_TO_TRIGANGLE(min*6);
+    angle = DEG_TO_TRIGANGLE(mindeg);
     inner_pos = bounds.size.w*settings.minsfillinnerpos/200;
     outer_pos = bounds.size.w*settings.minsfillouterpos/200;
     graphics_context_set_stroke_width(ctx, settings.minsfillthickness);
@@ -1170,10 +1538,11 @@ static void hands_update_proc(Layer *layer, GContext *ctx) {
   }
   
   // seconds hand
-  if( settings.secslength > 0 || settings.secsbalancelength > 0 ) {
+  bool secs_touches_center = false;
+  if( settings.secslength > 0 || settings.secsbalancelength > 0 || settings.secsneedlestart > 0 ) {
     if( settings.showsecond == 1 ) {
-      angle = DEG_TO_TRIGANGLE(sec*6);
-      inner_pos = -1*(bounds.size.w*settings.secsbalancelength/200);
+      angle = DEG_TO_TRIGANGLE(secdeg);
+      inner_pos = bounds.size.w*(settings.secsneedlestart - settings.secsbalancelength)/200;
       outer_pos = bounds.size.w*settings.secslength/200;
       graphics_context_set_stroke_width(ctx, settings.secsthickness);
       graphics_context_set_stroke_color(ctx, settings.secsdialcolor);
@@ -1184,15 +1553,20 @@ static void hands_update_proc(Layer *layer, GContext *ctx) {
       outer.x = (int16_t)(sin_lookup(angle) * (int32_t)outer_pos / TRIG_MAX_RATIO) + center.x;
       // draw seconds hand
       graphics_draw_line(ctx, inner, outer);
-      // draw circle 
-      graphics_fill_circle(ctx, center, settings.secsthickness-1);
-    }  
+      if( inner_pos <= 0 ) {
+        secs_touches_center = true;
+        if( settings.showcenterhub == 1 ) {
+          graphics_context_set_fill_color(ctx, settings.centerhubauto == 1 ? settings.secsdialcolor : settings.centerhubcolor);
+          graphics_fill_circle(ctx, center, settings.secsthickness-1);
+        }
+      }
+    }
   }
-  
+
   // seconds hand filling
   if( settings.secsfillinnerpos > 0 || settings.secsfillouterpos > 0 ) {
     if( settings.showsecond == 1 ) {
-      angle = DEG_TO_TRIGANGLE(sec*6);
+      angle = DEG_TO_TRIGANGLE(secdeg);
       inner_pos = bounds.size.w*settings.secsfillinnerpos/200;
       outer_pos = bounds.size.w*settings.secsfillouterpos/200;
       graphics_context_set_stroke_width(ctx, settings.secsfillthickness);
@@ -1207,12 +1581,19 @@ static void hands_update_proc(Layer *layer, GContext *ctx) {
     }  
   }
  
-  // dot in the middle
-  if( settings.hourlength > 0 || settings.minslength > 0 || settings.secslength > 0) {
-    graphics_context_set_fill_color(ctx, GColorDarkGray);
+  // axis dot in the middle (only if at least one hand actually reaches the
+  // center; needle-start hands that float away from the center skip this too)
+  if( settings.showcenteraxis == 1 &&
+      (hour_touches_center || mins_touches_center || secs_touches_center) ) {
+    graphics_context_set_fill_color(ctx, settings.centeraxiscolor);
     graphics_context_set_stroke_width(ctx, 1);
     graphics_fill_circle(ctx, center, 2);
-  }  
+  }
+
+  // steps dial/text drawn above the hands, if configured that way
+  if( settings.stepsontop == 1 ) {
+    draw_steps(ctx, center, bounds);
+  }
 }
 
 // Computes a point at the given angle and percent distance from center.
@@ -1287,28 +1668,28 @@ static void draw_moon_phase(GContext *ctx, GPoint moon_center, int32_t radius,
   graphics_context_set_fill_color(ctx, dim_color);
   graphics_fill_circle(ctx, moon_center, (uint16_t)radius);
 
-  GPoint half_pts[13];
+  GPoint half_pts[MOON_HALF_SEGMENTS + 1];
   int32_t half_start = bright_right ? 0 : (TRIG_MAX_RATIO / 2);
-  for (int i = 0; i <= 12; i++) {
-    int32_t a = half_start + (int32_t)(((int64_t)i * (TRIG_MAX_RATIO / 2)) / 12);
+  for (int i = 0; i <= MOON_HALF_SEGMENTS; i++) {
+    int32_t a = half_start + (int32_t)(((int64_t)i * (TRIG_MAX_RATIO / 2)) / MOON_HALF_SEGMENTS);
     half_pts[i].x = (int16_t)(((int64_t)radius * sin_lookup(a)) / TRIG_MAX_RATIO) + moon_center.x;
     half_pts[i].y = (int16_t)(-((int64_t)radius * cos_lookup(a)) / TRIG_MAX_RATIO) + moon_center.y;
   }
-  GPath half_path = { .num_points = 13, .points = half_pts, .rotation = 0, .offset = GPointZero };
+  GPath half_path = { .num_points = MOON_HALF_SEGMENTS + 1, .points = half_pts, .rotation = 0, .offset = GPointZero };
   graphics_context_set_fill_color(ctx, bright_color);
   gpath_draw_filled(ctx, &half_path);
 
   // Terminator: a full ellipse squeezed to |terminator_x|, on top of the
   // half-and-half base. This alone is what turns it into a crescent or a
   // gibbous shape instead of a plain half moon.
-  GPoint ellipse_pts[24];
+  GPoint ellipse_pts[MOON_ELLIPSE_SEGMENTS];
   int32_t ellipse_rx = (terminator_x < 0) ? -terminator_x : terminator_x;
-  for (int i = 0; i < 24; i++) {
-    int32_t a = (int32_t)(((int64_t)i * TRIG_MAX_RATIO) / 24);
+  for (int i = 0; i < MOON_ELLIPSE_SEGMENTS; i++) {
+    int32_t a = (int32_t)(((int64_t)i * TRIG_MAX_RATIO) / MOON_ELLIPSE_SEGMENTS);
     ellipse_pts[i].x = (int16_t)(((int64_t)ellipse_rx * sin_lookup(a)) / TRIG_MAX_RATIO) + moon_center.x;
     ellipse_pts[i].y = (int16_t)(-((int64_t)radius * cos_lookup(a)) / TRIG_MAX_RATIO) + moon_center.y;
   }
-  GPath ellipse_path = { .num_points = 24, .points = ellipse_pts, .rotation = 0, .offset = GPointZero };
+  GPath ellipse_path = { .num_points = MOON_ELLIPSE_SEGMENTS, .points = ellipse_pts, .rotation = 0, .offset = GPointZero };
   graphics_context_set_fill_color(ctx, ellipse_color);
   gpath_draw_filled(ctx, &ellipse_path);
 
@@ -1319,10 +1700,194 @@ static void draw_moon_phase(GContext *ctx, GPoint moon_center, int32_t radius,
   }
 }
 
+// Draws the "STEPS" label plus the step count as two lines inside a small
+// round or square badge, positioned like the date/bluetooth/battery displays.
+static void draw_steps_text(GContext *ctx, GPoint pos, int32_t steps) {
+  if (steps > 99999) {
+    steps = 99999;
+  }
+  char buf[8];
+  snprintf(buf, sizeof(buf), "%d", (int)steps);
+
+  GFont label_font, value_font;
+  int32_t radius;
+  GRect square, label_rect, value_rect;
+
+  switch (settings.stepssize) {
+    case 0: {
+      label_font = fonts_get_system_font(FONT_KEY_GOTHIC_09);
+      value_font = fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD);
+      radius = 20;
+      square = GRect(pos.x - 19, pos.y - 19, 38, 38);
+      label_rect = GRect(square.origin.x, square.origin.y + 2, square.size.w, 12);
+      value_rect = GRect(square.origin.x, square.origin.y + 13, square.size.w, 20);
+      break;
+    }
+    case 2: {
+      label_font = fonts_get_system_font(FONT_KEY_GOTHIC_14);
+      value_font = fonts_get_system_font(FONT_KEY_GOTHIC_28_BOLD);
+      radius = 30;
+      square = GRect(pos.x - 29, pos.y - 29, 58, 58);
+      label_rect = GRect(square.origin.x, square.origin.y + 4, square.size.w, 16);
+      value_rect = GRect(square.origin.x, square.origin.y + 20, square.size.w, 30);
+      break;
+    }
+    default: {
+      label_font = fonts_get_system_font(FONT_KEY_GOTHIC_09);
+      value_font = fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD);
+      radius = 25;
+      square = GRect(pos.x - 24, pos.y - 24, 48, 48);
+      label_rect = GRect(square.origin.x, square.origin.y + 3, square.size.w, 14);
+      value_rect = GRect(square.origin.x, square.origin.y + 16, square.size.w, 26);
+    }
+  }
+
+  graphics_context_set_stroke_width(ctx, 2);
+  graphics_context_set_fill_color(ctx, settings.stepstextbackcolor);
+  graphics_context_set_stroke_color(ctx, settings.stepstextbordercolor);
+
+  if (settings.stepsshape == 0) {
+    graphics_fill_circle(ctx, pos, (uint16_t)radius);
+    graphics_draw_circle(ctx, pos, (uint16_t)radius);
+  } else {
+    graphics_fill_rect(ctx, square, 0, GCornerNone);
+    graphics_draw_rect(ctx, square);
+  }
+
+  graphics_context_set_text_color(ctx, settings.stepslabelcolor);
+  graphics_draw_text(ctx, "STEPS", label_font, label_rect, GTextOverflowModeFill, GTextAlignmentCenter, NULL);
+  graphics_context_set_text_color(ctx, settings.stepsvaluecolor);
+  graphics_draw_text(ctx, buf, value_font, value_rect, GTextOverflowModeFill, GTextAlignmentCenter, NULL);
+}
+
+// Draws the steps sub-dial: 12 configurable marks (a full turn = 12000
+// steps), an optional border with selectable thickness, and an
+// hour-hand-style needle (with its own accent fill). The needle simply
+// caps at the top once 12000 steps is reached.
+static void draw_steps_dial(GContext *ctx, GPoint center, int32_t dial_radius, int32_t steps) {
+  const int32_t scale = 12000;
+  int32_t shown_steps = (steps > scale) ? scale : steps;
+
+  // needle angle; snapped to the same 6-degree grid as the clock hands when
+  // discrete mode is on (6 degrees = 200 steps on the 12000-step dial)
+  int32_t needle_angle;
+  if (settings.discretehands == 1) {
+    int32_t deg = (int32_t)(((int64_t)shown_steps * 360 / scale) / 6 * 6);
+    needle_angle = DEG_TO_TRIGANGLE(deg);
+  } else {
+    needle_angle = (int32_t)(((int64_t)shown_steps * TRIG_MAX_RATIO) / scale);
+  }
+
+  // progress segment from 12 o'clock to the current value, in needle color,
+  // spanning the needle's radial range (start..length). Drawn first so the
+  // marks and border stay visible on top of it.
+  //
+  // The needle is a thick line with round end caps, so it actually reaches
+  // half its thickness beyond both of its endpoints. The segment has to be
+  // inflated by the same amount, otherwise a thick needle visibly sticks out
+  // of the arc that is supposed to end in it.
+  if (settings.stepssegment == 1) {
+    int32_t cap = settings.stepsneedlethickness / 2;
+    int32_t seg_outer = dial_radius * settings.stepsneedlelength / 100 + cap;
+    int32_t seg_inner = dial_radius * settings.stepsneedlestart / 100 - cap;
+    if (seg_inner < 0) seg_inner = 0;
+    if (seg_outer > seg_inner && needle_angle > 0) {
+      GRect seg_rect = GRect(center.x - seg_outer, center.y - seg_outer,
+                             2 * seg_outer, 2 * seg_outer);
+      graphics_context_set_fill_color(ctx, settings.stepsneedlecolor);
+      graphics_fill_radial(ctx, seg_rect, GOvalScaleModeFitCircle,
+                           (uint16_t)(seg_outer - seg_inner), 0, needle_angle);
+    }
+  }
+
+  // 12 evenly spaced marks (one per 1000 steps)
+  graphics_context_set_stroke_color(ctx, settings.stepsmarkcolor);
+  graphics_context_set_stroke_width(ctx, settings.stepsmarkthickness);
+  int32_t mark_outer_r = dial_radius * settings.stepsmarkouterpos / 100;
+  int32_t mark_inner_r = dial_radius * settings.stepsmarkinnerpos / 100;
+  for (int i = 0; i < 12; i++) {
+    int32_t a = (int32_t)(((int64_t)i * TRIG_MAX_RATIO) / 12);
+    GPoint m_outer, m_inner;
+    m_outer.x = (int16_t)(((int64_t)mark_outer_r * sin_lookup(a)) / TRIG_MAX_RATIO) + center.x;
+    m_outer.y = (int16_t)(-((int64_t)mark_outer_r * cos_lookup(a)) / TRIG_MAX_RATIO) + center.y;
+    m_inner.x = (int16_t)(((int64_t)mark_inner_r * sin_lookup(a)) / TRIG_MAX_RATIO) + center.x;
+    m_inner.y = (int16_t)(-((int64_t)mark_inner_r * cos_lookup(a)) / TRIG_MAX_RATIO) + center.y;
+    graphics_draw_line(ctx, m_inner, m_outer);
+  }
+
+  if (settings.stepsdialborder == 1) {
+    graphics_context_set_stroke_color(ctx, settings.stepsdialbordercolor);
+    graphics_context_set_stroke_width(ctx, settings.stepsdialborderthickness);
+    graphics_draw_circle(ctx, center, (uint16_t)dial_radius);
+  }
+
+  // needle fill (accent stripe), same idea as the hour hand filling
+  if (settings.stepsfillinnerpos > 0 || settings.stepsfillouterpos > 0) {
+    int32_t f_inner = dial_radius * settings.stepsfillinnerpos / 100;
+    int32_t f_outer = dial_radius * settings.stepsfillouterpos / 100;
+    graphics_context_set_stroke_width(ctx, settings.stepsfillthickness);
+    graphics_context_set_stroke_color(ctx, settings.stepsfillcolor);
+    GPoint f_inner_p, f_outer_p;
+    f_inner_p.y = (int16_t)(-cos_lookup(needle_angle) * f_inner / TRIG_MAX_RATIO) + center.y;
+    f_inner_p.x = (int16_t)(sin_lookup(needle_angle) * f_inner / TRIG_MAX_RATIO) + center.x;
+    f_outer_p.y = (int16_t)(-cos_lookup(needle_angle) * f_outer / TRIG_MAX_RATIO) + center.y;
+    f_outer_p.x = (int16_t)(sin_lookup(needle_angle) * f_outer / TRIG_MAX_RATIO) + center.x;
+    graphics_draw_line(ctx, f_inner_p, f_outer_p);
+  }
+
+  // needle
+  // needlestart moves the inner end out along the pointing direction (a
+  // floating needle, e.g. a dot); balancelength extends it the opposite way
+  // through the center (a counterweight). They share the same point.
+  int32_t n_inner = dial_radius * (settings.stepsneedlestart - settings.stepsneedlebalancelength) / 100;
+  int32_t n_outer = dial_radius * settings.stepsneedlelength / 100;
+  graphics_context_set_stroke_width(ctx, settings.stepsneedlethickness);
+  graphics_context_set_stroke_color(ctx, settings.stepsneedlecolor);
+  graphics_context_set_fill_color(ctx, settings.stepsneedlecolor);
+  GPoint n_inner_p, n_outer_p;
+  n_inner_p.y = (int16_t)(-cos_lookup(needle_angle) * n_inner / TRIG_MAX_RATIO) + center.y;
+  n_inner_p.x = (int16_t)(sin_lookup(needle_angle) * n_inner / TRIG_MAX_RATIO) + center.x;
+  n_outer_p.y = (int16_t)(-cos_lookup(needle_angle) * n_outer / TRIG_MAX_RATIO) + center.y;
+  n_outer_p.x = (int16_t)(sin_lookup(needle_angle) * n_outer / TRIG_MAX_RATIO) + center.x;
+  graphics_draw_line(ctx, n_inner_p, n_outer_p);
+  if( n_inner <= 0 ) {
+    int32_t hub = settings.stepsneedlethickness - 1;
+    graphics_fill_circle(ctx, center, (uint16_t)(hub > 0 ? hub : 1));
+  }
+}
+
+// Draws the steps text/dial at its configured position. Shared between
+// dot_update_proc and hands_update_proc so the "stepsontop" setting can
+// place it below or above the hour/minute/second hands.
+static void draw_steps(GContext *ctx, GPoint center, GRect bounds) {
+  if( settings.showsteps != 1 ) {
+    return;
+  }
+
+  int32_t steps = 0;
+  HealthServiceAccessibilityMask mask = health_service_metric_accessible(HealthMetricStepCount, time_start_of_today(), time(NULL));
+  if (mask & HealthServiceAccessibilityMaskAvailable) {
+    steps = (int32_t)health_service_sum_today(HealthMetricStepCount);
+  }
+
+  int32_t angle = DEG_TO_TRIGANGLE(settings.stepsposdegree);
+  int32_t inner_pos = bounds.size.w*settings.stepspositionrim/200;
+  GPoint inner;
+  inner.y = (int16_t)(-cos_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.y;
+  inner.x = (int16_t)(sin_lookup(angle) * (int32_t)inner_pos / TRIG_MAX_RATIO) + center.x;
+
+  if( settings.stepsstyle == 0 ) {
+    draw_steps_text(ctx, inner, steps);
+  } else {
+    int32_t dial_radius = bounds.size.w*settings.stepsdialradius/200;
+    draw_steps_dial(ctx, inner, dial_radius, steps);
+  }
+}
+
 static void dot_update_proc(Layer *layer, GContext *ctx) {
   
   GRect bounds  = layer_get_bounds(s_dot_layer);
-  GPoint center = GPoint( bounds.size.w/2, bounds.size.h/2);
+  GPoint center = GPoint( bounds.size.w/2 + settings.screenoffsetx, bounds.size.h/2 + settings.screenoffsety);
   GFont font = NULL;
   
   int inner_pos, outer_pos;
@@ -1338,6 +1903,11 @@ static void dot_update_proc(Layer *layer, GContext *ctx) {
   } 
   else {
     window_set_background_color(s_window, settings.backcolor);
+  }
+
+  // steps drawn underneath the hour/minute marks, if configured that way
+  if( settings.stepsontop == 2 ) {
+    draw_steps(ctx, center, bounds);
   }
 
   // minute marks
@@ -1838,6 +2408,11 @@ static void dot_update_proc(Layer *layer, GContext *ctx) {
                      settings.moonborder == 1, settings.moonbordercolor, settings.moonhemisphere == 1);
   }
 
+  // steps above the marks but below the hands (the default layer)
+  if( settings.stepsontop == 0 ) {
+    draw_steps(ctx, center, bounds);
+  }
+
   if( settings.fullscreen == 0 ) {
     graphics_context_set_stroke_color(ctx, GColorBlack);
     graphics_context_set_stroke_width(ctx, 3 );
@@ -1905,8 +2480,24 @@ static void init() {
   
   //Register AppMessage events
   app_message_register_inbox_received(in_received_handler);
-  //Largest possible input and output buffer sizes  
-  app_message_open(1280,1280);
+  AppMessageResult msg_result = APP_MSG_OUT_OF_MEMORY;
+  for( unsigned i = 0; i < ARRAY_LENGTH(APP_MSG_INBOX_SIZES); i++ ) {
+    msg_result = app_message_open(APP_MSG_INBOX_SIZES[i], APP_MSG_OUTBOX_SIZE);
+    if( msg_result == APP_MSG_OK ) {
+      if( i > 0 ) {
+        APP_LOG(APP_LOG_LEVEL_INFO, "inbox fell back to %d bytes (dictionary is %d)",
+                APP_MSG_INBOX_SIZES[i], APP_MSG_DICT_BYTES);
+      }
+      if( APP_MSG_INBOX_SIZES[i] < APP_MSG_DICT_BYTES ) {
+        APP_LOG(APP_LOG_LEVEL_ERROR, "inbox %d < dictionary %d - settings will be dropped",
+                APP_MSG_INBOX_SIZES[i], APP_MSG_DICT_BYTES);
+      }
+      break;
+    }
+  }
+  if( msg_result != APP_MSG_OK ) {
+    APP_LOG(APP_LOG_LEVEL_ERROR, "app_message_open failed (%d) - settings cannot arrive", msg_result);
+  }
 
   window_stack_push(s_window, true);
 
